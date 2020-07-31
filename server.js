@@ -1,6 +1,6 @@
 // include dependencies
 var express = require('express');
-var handlebars = require('express-handlebars').create({defaultLayout:'main'});
+var handlebars = require('express-handlebars').create({defaultLayout:'page'});
 var path = require('path');
 var mysql = require('./dbcon.js');
 
@@ -19,7 +19,7 @@ app.use(express.static('public'));
 
 // index
 app.get('/', function(req, res, next) {
-	res.render('index');
+	res.render('index', {layout: 'home'});
 });
 
 // login
