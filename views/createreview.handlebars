@@ -1,0 +1,28 @@
+<div class="container">
+
+    <div class="create_review_title">
+	    <h1 class="create_review_title">Create Review</h1>
+    </div>
+
+    <div class="create_review_form">
+        <form>
+	    <label>Name of School/Professor</label>
+	    <input type="text" id="reviewname" name="reviewname"><br><br>
+	    <input type="radio" id="professor" name="reviewtype" value="professor">	
+	    <label for="professor">Professor</label><br><br>
+	    <input type="radio" id="school" name="reviewtype" value="school">	
+	    <label for="school">School</label><br><br>
+	    <label for="rating">Rating</label>
+	    <input type="range" id="rating" name="rating" min="0" max="10"><br><br>
+	    <label for="justification">Justification</label><br>
+	    <textarea id="justification" name="justification" rows="4" cols="50"></textarea><br><br>
+	    <input type="submit" value="Submit">
+	    </form>
+    </div>
+
+    <div class="create_review_misc">
+        <a class="normal text"> Notes for peer reviewers:
+When creating a review, an entry is also added to either the UserProfessorIntersections table or the UserSchoolIntersections table. This is done using foreign keys. See the Data Manipulation Queries in the .zip for more info.</a>
+	    <a class="normal text">This page will modify the Reviews table</a>
+    </div>
+</div>

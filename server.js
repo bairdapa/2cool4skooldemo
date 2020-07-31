@@ -1,6 +1,7 @@
 // include dependencies
 var express = require('express');
-var handlebars = require('express-handlebars').create({defaultLayout:'main'});
+var handlebars = require('express-handlebars').create({defaultLayout:'page'});
+var path = require('path');
 var mysql = require('./dbcon.js');
 
 
@@ -10,21 +11,51 @@ app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('port', process.argv[2]);
 
+app.use(express.static('public'));
 
 /* 
  * Endpoints
  */
 
 // index
-app.get('/',function(req,res,next){
-	var context = {};
-	mysql.pool.query('SELECT * FROM diagnostic', function(err, rows, fields){
-		context.results = JSON.stringify(rows);
-		res.render('home', context);
-	});
+app.get('/', function(req, res, next) {
+	res.render('index', {layout: 'home'});
 });
 
-// more endpoints will be implemented here
+// login
+app.get('/login',function(req, res, next) {
+	res.render('login');
+});
+
+// create account
+app.get('/createaccount',function(req, res, next) {
+	res.render('createaccount');
+});
+
+// create review
+app.get('/createreview',function(req, res, next) {
+	res.render('createreview');
+});
+
+// professors
+app.get('/professors',function(req, res, next) {
+	res.render('professors');
+});
+
+// reviews
+app.get('/reviews',function(req, res, next) {
+	res.render('reviews');
+});
+
+// schools
+app.get('/schools',function(req, res, next) {
+	res.render('schools');
+});
+
+// user
+app.get('/user',function(req, res, next) {
+	res.render('user');
+});
 
 
 // catch errors (404 and 500)
