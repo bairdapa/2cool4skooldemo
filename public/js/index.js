@@ -1,6 +1,6 @@
-function fillSearch(elem_id) {
+function fillSearch(id) {
 	vars = getUrlVars();
-	document.getElementById(elem_id).value = vars["profsearch"];
+	document.getElementById(id).value = vars[id];
 }
 
 
