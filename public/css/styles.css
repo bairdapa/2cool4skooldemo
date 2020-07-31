@@ -1,0 +1,173 @@
+div.container {
+	position: relative;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	background-color: white;
+}
+
+div.home_title, div.create_account_title, div.login_title, div.create_review_title, div.schools_title, div.professors_title {
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	right: 100px;
+	height: 200px;
+	text-align: center;
+}
+
+div.user_profile_photo, div.reviews_page_photo {
+	position: absolute;
+	width: 150px;
+	height: 150px;
+	top: 55px;
+	left: 120px;
+}
+
+div.user_profile_title, div.reviews_page_title {
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	right: 100px;
+	height: 200px;
+	text-align: center;
+}
+
+div.user_profile_bio {
+	position: absolute;
+	top: 250px;
+	left: 100px;
+	right: 100px;
+}
+
+div.user_profile_reviews {
+	position: absolute;
+	top: 350px;
+	left: 300px;
+}
+
+div.home_search_container {
+	position: absolute;
+	top: 400px;
+	left: 100px;
+	right: 100px;
+	height: 100px;
+}
+
+div.home_search_prof {
+	position: absolute;
+	float: left;
+	left: 10%;
+	width: 30%;
+	height: 100px;
+}
+
+div.home_search_school {
+	position: absolute;
+	float: right;
+	right: 10%;
+	width: 30%;
+	height: 100px;
+}
+
+div.home_review {
+	position: absolute;
+	top: 600px;
+	left: 400px;
+	right: 400px;
+	height: 100px;
+	text-align: center;
+}
+
+div.home_misc {
+	position: absolute;
+	top: 750px;
+	left: 50px;
+	right: 50px;
+	height: 150px;
+}
+
+div.account {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	width: 200px;
+	height: 100px;
+}
+
+h1.home_title, h1.create_account_title, h1.login_title, h1.create_review_title, h1.user_profile_title, h1.reviews_page_title, h1.schools_title, h1.professors_title {
+	font-family: Helvetica;
+	font-size: 70px;
+	color: black;
+}
+
+div.create_account_form, div.login_form, div.create_review_form {
+	position: absolute;
+	left: 50px;
+	right: 50px;
+	top: 300px;
+	height: 300px;
+	text-align: center;
+}
+
+div.centered_search {
+	position: absolute;
+	top:300px;
+	left: 100px;
+	right: 100px;
+	text-align: center;
+	height: 200px;
+}
+
+div.search_results {
+	position: absolute;
+	top: 400px;
+	left: 100px;
+	right: 100px;
+	text-align: center;   
+	height: 300px;
+}
+
+div.create_account_misc, div.create_review_misc, div.login_misc, div.user_profile_misc, div.reviews_page_misc, div.schools_misc, div.professors_misc {
+	position: absolute;
+	left: 50px;
+	right: 50px;
+	top: 600px;
+	height: 300px;
+}
+
+div.reviews_page_subtitle {
+	position: absolute;
+	top: 175px;
+	left: 300px;
+}
+
+div.reviews_page_table {
+	position: absolute;
+	top: 300px;
+	left: 300px;
+}
+
+div.home_link {
+	position: absolute;
+	left: 25px;
+	top: 25px;
+}
+
+.normal_text {
+	font-family: Helvetica;
+	font-size: 20px;
+	color: black;
+}
+
+table {
+	position: relative;
+	border: solid;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table, td, tr, th {
+	border: solid;
+}
+

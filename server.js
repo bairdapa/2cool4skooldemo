@@ -19,11 +19,7 @@ app.use(express.static('public'));
 
 // index
 app.get('/',function(req,res,next){
-	var context = {};
-	mysql.pool.query('SELECT * FROM diagnostic', function(err, rows, fields){
-		context.results = JSON.stringify(rows);
-		res.render('home', context);
-	});
+	res.render('index');
 });
 
 // more endpoints will be implemented here
