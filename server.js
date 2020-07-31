@@ -1,6 +1,7 @@
 // include dependencies
 var express = require('express');
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
+var path = require('path');
 var mysql = require('./dbcon.js');
 
 
@@ -10,6 +11,7 @@ app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('port', process.argv[2]);
 
+app.use(express.static('public'));
 
 /* 
  * Endpoints
