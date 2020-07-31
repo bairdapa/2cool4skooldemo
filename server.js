@@ -18,11 +18,44 @@ app.use(express.static('public'));
  */
 
 // index
-app.get('/',function(req,res,next){
+app.get('/', function(req, res, next) {
 	res.render('index');
 });
 
-// more endpoints will be implemented here
+// login
+app.get('/login',function(req, res, next) {
+	res.render('login');
+});
+
+// create account
+app.get('/createaccount',function(req, res, next) {
+	res.render('createaccount');
+});
+
+// create review
+app.get('/createreview',function(req, res, next) {
+	res.render('createreview');
+});
+
+// professors
+app.get('/professors',function(req, res, next) {
+	res.render('professors');
+});
+
+// reviews
+app.get('/reviews',function(req, res, next) {
+	res.render('reviews');
+});
+
+// schools
+app.get('/schools',function(req, res, next) {
+	res.render('schools');
+});
+
+// user
+app.get('/user',function(req, res, next) {
+	res.render('user');
+});
 
 
 // catch errors (404 and 500)
