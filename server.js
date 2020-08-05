@@ -16,19 +16,19 @@ app.use(express.static('public'));
 function convert_rating(rating) {
 	switch(rating) {
 		case 0:
-			return "0stars";
+			return "☆☆☆☆☆";
 		case 1:
-			return "1star";
+			return "★☆☆☆☆";
 		case 2:
-			return "2star";
+			return "★★☆☆☆";
 		case 3:
-			return "3star";
+			return "★★★☆☆";
 		case 4:
-			return "4star";
+			return "★★★★☆";
 		case 5:
-			return "4star";
+			return "★★★★★";
 	}
-	return "0star";
+	return "☆☆☆☆☆";
 }
 
 /* 
