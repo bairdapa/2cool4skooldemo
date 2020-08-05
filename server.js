@@ -3,6 +3,7 @@ var express = require('express');
 var handlebars = require('express-handlebars').create({defaultLayout:'page'});
 var path = require('path');
 var mysql = require('./dbcon.js');
+var url = require('url');
 
 
 // set up app
@@ -97,9 +98,32 @@ app.get('/schoolreviews',function(req, res, next) {
 
 // professor reviews
 app.get('/professorreviews',function(req, res, next) {
-	var queryString = "SELECT * FROM Reviews INNER JOIN Professors ON Professors.professorId = Reviews.professorId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.professorId=1;";
+	var url_params = url.parse(req.url, true).query;
+
+	var ratingQueryString = "SELECT * FROM Reviews INNER JOIN Professors ON Professors.professorId = Reviews.professorId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.professorId = ?";
+	var profQueryString = "SELECT Professors.pictureURL, Professors.fName, Professors.lName, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Schools ON Schools.schoolId = Professors.schoolId INNER JOIN Worlds ON Worlds.worldId = Professors.worldId WHERE Professors.professorId = ?"
+
+	var pdata = {};
 	
-	mysql.pool.query(queryString, function(err, rows, fields) {
+	mysql.pool.query(profQueryString, url_params.id, function(err, rows, fields) {
+		if(err) {
+			console.log("sql error on professorreviews endpoint:\n");
+			console.log(err);
+			res.status(500).render('500');
+			return;
+		}
+		else if (rows.length == 0)
+		{
+			res.status(404).render('404');
+			return;
+		}
+		else
+		{
+			pdata = rows[0];
+		}
+	});
+	
+	mysql.pool.query(ratingQueryString, url_params.id, function(err, rows, fields) {
 		if(err) {
 			console.log("sql error on professorreviews endpoint:\n");
 			console.log(err);
@@ -107,13 +131,17 @@ app.get('/professorreviews',function(req, res, next) {
 		}
 		else
 		{
+			var rating_counter = 0;
 			for(var i = 0; i < rows.length; i++)
 			{
+				rating_counter += rows[i].rating;
 				rows[i].rating = convert_rating(rows[i].rating);
 			}
+			pdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
 			res.status(200);
 			res.render('professorreviews', {
-				results: rows	
+				results: rows,
+				profdata: pdata
 			});
 		}
 	});

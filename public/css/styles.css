@@ -16,7 +16,7 @@ div.home_title, div.create_account_title, div.login_title, div.create_review_tit
 	text-align: center;
 }
 
-div.user_profile_photo, div.reviews_page_photo {
+div.user_profile_photo {
 	position: absolute;
 	width: 150px;
 	height: 150px;
@@ -24,7 +24,7 @@ div.user_profile_photo, div.reviews_page_photo {
 	left: 120px;
 }
 
-div.user_profile_title, div.reviews_page_title {
+div.user_profile_title {
 	position: absolute;
 	top: 100px;
 	left: 100px;
@@ -136,10 +136,12 @@ div.create_account_misc, div.create_review_misc, div.login_misc, div.user_profil
 	height: 300px;
 }
 
-div.reviews_page_subtitle {
+div.reviews_page_container {
 	position: absolute;
-	top: 175px;
-	left: 300px;
+	top: 35px;
+	width: 800px;
+	height: 200px;
+	left: calc(50% - 400px);
 }
 
 div.reviews_page_tiles {
@@ -215,7 +217,7 @@ img.review_image {
 	height: 100px;
 }
 
-a.review_name {
+a.review_name, a.professortile_title {
 	font-family: Helvetica;
 	font-size: 30px;
 	color: black;
@@ -227,4 +229,43 @@ a.review_rating {
 	color: black;
 	float: right;
 }
+
+div.professortile_container {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	padding: 8px;
+	box-sizing: border-box;
+	border-style: solid;
+	border-width: 2px;
+	border-color: black;
+}
+
+div.professortile_image {
+	float: left;
+	width: 180px;
+	height: 100%;
+}
+
+img.professortile_image {
+	width: 180px;
+	height: 180px;
+}
+
+div.professortile_title {
+	float: left;
+	width: 600px;
+	height: 50px;
+	padding: 10px;
+	box-sizing: border-box;
+}
+
+div.professortile_body {
+	float: left;
+	width: 600px;
+	height: 130px;
+	padding: 10px;
+	box-sizing: border-box;
+}
+
 
