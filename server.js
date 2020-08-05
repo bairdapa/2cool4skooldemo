@@ -61,9 +61,40 @@ app.get('/createreview',function(req, res, next) {
 });
 
 // search professors
-app.get('/professors',function(req, res, next) {
-	res.status(200);
-	res.render('professors');
+app.get('/searchprofessors',function(req, res, next) {
+	var url_params = url.parse(req.url, true).query;
+
+	var searchQueryString = "SELECT Professors.professorId FROM Professors WHERE Professors.fname = ? AND Professors.lname = ?";
+
+	var responseJSON = {
+		found: false,
+		id: -1
+	};
+
+	if(url_params.fname == null || url_params.lname == null)
+	{
+		res.status(200).json(responseJSON);	
+		return;
+	}
+
+	mysql.pool.query(searchQueryString, [url_params.fname, url_params.lname], function(err, rows, fields) {
+		if(err) {
+			console.log("sql error in prof search endpoint:\n");
+			console.log(err);
+			res.status(500).json(responseJSON);
+			return;
+		}	
+		else if(rows.length == 0)
+		{
+			res.status(200).json(responseJSON);
+			return;
+		}
+		else {
+			responseJSON.found = true;
+			responseJSON.id = rows[0].professorId;
+			res.status(200).json(responseJSON);
+		}
+	});
 });
 
 // search schools
@@ -202,7 +233,8 @@ app.use(function(req,res){
 });
 
 app.use(function(err, req, res, next){
-	console.error(err.stack);
+	console.log("general 500 error caught");
+	console.error(err);
 	res.status(500);
 	res.render('500');
 });
