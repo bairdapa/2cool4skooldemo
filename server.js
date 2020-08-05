@@ -67,8 +67,26 @@ app.get('/professors',function(req, res, next) {
 
 // search schools
 app.get('/schools',function(req, res, next) {
-	res.status(200);
-	res.render('schools');
+	var queryString = "SELECT * FROM Reviews INNER JOIN Schools ON Schools.schoolId = Reviews.schoolId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.schoolId=1;"
+	
+	mysql.pool.query(queryString, function(err, rows, fields) {
+		if(err) {
+			console.log("sql error on schoolreviews endpoint:\n");
+			console.log(err);
+			res.status(500).render('500');
+		}
+		else
+		{
+			for(var i = 0; i < rows.length; i++)
+			{
+				rows[i].rating = convert_rating(rows[i].rating);
+			}
+			res.status(200);
+			res.render('schoolreviews', {
+				results: rows	
+			});
+		}
+	});
 });
 
 // professor reviews
@@ -93,7 +111,6 @@ app.get('/professorreviews',function(req, res, next) {
 			});
 		}
 	});
-
 });
 
 // school reviews
