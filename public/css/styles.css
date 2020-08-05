@@ -217,7 +217,7 @@ img.review_image {
 	height: 100px;
 }
 
-a.review_name, a.professortile_title {
+a.review_name, a.professortile_title, a.schooltile_title {
 	font-family: Helvetica;
 	font-size: 30px;
 	color: black;
@@ -230,7 +230,7 @@ a.review_rating {
 	float: right;
 }
 
-div.professortile_container {
+div.professortile_container, div.schooltile_container {
 	position: relative;
 	width: 100%;
 	height: 100%;
@@ -241,18 +241,18 @@ div.professortile_container {
 	border-color: black;
 }
 
-div.professortile_image {
+div.professortile_image, div.schooltile_image {
 	float: left;
 	width: 180px;
 	height: 100%;
 }
 
-img.professortile_image {
+img.professortile_image, img.schooltile_image {
 	width: 180px;
 	height: 180px;
 }
 
-div.professortile_title {
+div.professortile_title, div.schooltile_title {
 	float: left;
 	width: 600px;
 	height: 50px;
@@ -260,7 +260,7 @@ div.professortile_title {
 	box-sizing: border-box;
 }
 
-div.professortile_body {
+div.professortile_body, div.schooltile_body {
 	float: left;
 	width: 600px;
 	height: 130px;
