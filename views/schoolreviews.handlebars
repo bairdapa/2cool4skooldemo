@@ -1,0 +1,16 @@
+<div class="container">
+    
+    <div class="reviews_page_container">
+		{{> schooltile schooldata}}
+    </div>
+
+    <div class="reviews_page_tiles">
+		{{#each results}}
+			{{> reviewtile}}
+		{{/each}}
+    </div>
+
+    <div class="reviews_page_misc">
+	    <a class="normal_text">note: this page is for the Reviews table</a>
+    </div>
+</div>
