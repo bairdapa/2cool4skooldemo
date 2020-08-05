@@ -16,7 +16,20 @@ $(document).ready(function() {
 	$("#prof_search_button").click(function() {
 		var full_name = document.getElementById("prof_search_textbox").value;
 		var name_arr = full_name.split(" ");
-		//alert(name_arr[0]);
-		alert(name_arr[1]);
+	
+		$.get("searchprofessors?fname=" + name_arr[0] + "&lname=" + name_arr[1], function(data, status) {
+			if(status == "success") {
+				if(data.found) {
+					window.location.href = "professorreviews?id=" + data.id;
+				}
+				else
+				{
+					alert("the professor you searched for is not in the database, please refine your search");
+				}
+			}
+			else {
+				alert("search request caused an error on the server!");
+			}
+		});
 	});
 });
