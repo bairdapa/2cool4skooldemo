@@ -67,6 +67,12 @@ app.get('/professors',function(req, res, next) {
 
 // search schools
 app.get('/schools',function(req, res, next) {
+	res.status(200);
+	res.render('schools');
+});
+
+// school reviews
+app.get('/schoolreviews',function(req, res, next) {
 	var queryString = "SELECT * FROM Reviews INNER JOIN Schools ON Schools.schoolId = Reviews.schoolId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.schoolId=1;"
 	
 	mysql.pool.query(queryString, function(err, rows, fields) {
@@ -111,12 +117,6 @@ app.get('/professorreviews',function(req, res, next) {
 			});
 		}
 	});
-});
-
-// school reviews
-app.get('/schoolreviews',function(req, res, next) {
-	res.status(200);
-	res.render('schoolreviews');
 });
 
 // user
