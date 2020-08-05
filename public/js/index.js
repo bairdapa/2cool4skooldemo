@@ -12,3 +12,9 @@ function getUrlVars() {
 	return vars;
 }
 
+
+$("prof_search_button").click(function() {
+	$.get("url", function(data, status) {
+		alert("Data: " + data + "\nStatus: " + status);
+	});
+});
