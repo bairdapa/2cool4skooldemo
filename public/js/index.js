@@ -14,6 +14,9 @@ function getUrlVars() {
 
 $(document).ready(function() {
 	$("#prof_search_button").click(function() {
-		//put parsing code here
+		var full_name = document.getElementById("prof_search_textbox").value;
+		var name_arr = full_name.split(" ");
+		//alert(name_arr[0]);
+		alert(name_arr[1]);
 	});
 });
