@@ -1,0 +1,27 @@
+<div class="container">
+    
+    <div class="reviews_page_photo">
+	    <img src="res/profile-placeholder.png" alt="User Image" style="width:150px;height:150px;">
+    </div>
+
+    <div class="reviews_page_title">
+	    <h1 class="reviews_page_title">Albus Dumbledore</h1>
+    </div>
+
+    <div class="reviews_page_subtitle">
+        <a>School:</a>
+	    <a>Hogwarts  (note these fields will be different depending on if it is a review for a school or a professor)</a><br>
+	    <a>World:</a>
+	    <a>Harry Potter</a>
+    </div>
+
+    <div class="reviews_page_table">
+			{{#each results}}
+				{{> reviewtile}}
+			{{/each}}
+    </div>
+
+    <div class="reviews_page_misc">
+	    <a class="normal_text">note: this page is for the Reviews table</a>
+    </div>
+</div>

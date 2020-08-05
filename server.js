@@ -13,47 +13,98 @@ app.set('port', process.argv[2]);
 
 app.use(express.static('public'));
 
+function convert_rating(rating) {
+	switch(rating) {
+		case 0:
+			return "0stars";
+		case 1:
+			return "1star";
+		case 2:
+			return "2star";
+		case 3:
+			return "3star";
+		case 4:
+			return "4star";
+		case 5:
+			return "4star";
+	}
+	return "0star";
+}
+
 /* 
  * Endpoints
  */
 
 // index
 app.get('/', function(req, res, next) {
+	res.status(200);
 	res.render('index', {layout: 'home'});
 });
 
 // login
 app.get('/login',function(req, res, next) {
+	res.status(200);
 	res.render('login');
 });
 
 // create account
 app.get('/createaccount',function(req, res, next) {
+	res.status(200);
 	res.render('createaccount');
 });
 
 // create review
 app.get('/createreview',function(req, res, next) {
+	res.status(200);
 	res.render('createreview');
 });
 
-// professors
+// search professors
 app.get('/professors',function(req, res, next) {
+	res.status(200);
 	res.render('professors');
 });
 
-// reviews
-app.get('/reviews',function(req, res, next) {
-	res.render('reviews');
+// search schools
+app.get('/schools',function(req, res, next) {
+	res.status(200);
+	res.render('schools');
 });
 
-// schools
-app.get('/schools',function(req, res, next) {
-	res.render('schools');
+// professor reviews
+app.get('/professorreviews',function(req, res, next) {
+	var queryString = "SELECT * FROM Reviews INNER JOIN Professors ON Professors.professorId = Reviews.professorId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.professorId=1;";
+	
+	mysql.pool.query(queryString, function(err, rows, fields) {
+		if(err) {
+			console.log("sql error on professorreviews endpoint:\n");
+			console.log(err);
+			res.status(500).render('500');
+		}
+		else
+		{
+			for(var i = 0; i < rows.length; i++)
+			{
+				rows[i].rating = convert_rating(rows[i].rating);
+			}
+			res.status(200);
+			res.render('professorreviews', {
+				results: rows	
+			});
+		}
+	});
+
+});
+
+// school reviews
+app.get('/schoolreviews',function(req, res, next) {
+	res.status(200);
+	res.render('schoolreviews');
 });
 
 // user
 app.get('/user',function(req, res, next) {
+	res.status(200);
 	res.render('user');
 });
 
