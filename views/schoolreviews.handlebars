@@ -15,34 +15,10 @@
 	    <a>Harry Potter</a>
     </div>
 
-    <div class="reviews_page_table">
-	    <a>List of reviews by this user</a>
-	    <table>
-		    <tr>
-			    <th>Review Author Fname</th>
-			    <th>Lname</th>
-			    <th>Rating</th>
-			    <th>Justification</th>
-		    </tr>
-		    <tr>
-			    <td>Harry</td>
-			    <td>Potter</td>
-			    <td>★★★★★</td>
-			    <td>He drank an evil potion so I wouldn't have to</td>
-		    </tr>
-		    <tr>
-			    <td>Draco</td>
-			    <td>Malfoy</td>
-			    <td>★☆☆☆☆</td>
-			    <td>Always taking points away from Slytherin</td>
-		    </tr>
-		    <tr>
-			    <td>Bart</td>
-			    <td>Simpson</td>
-			    <td>★★★★★</td>
-			    <td>cool magic</td>
-		    </tr>
-	    </table>
+    <div class="reviews_page_tiles">
+		{{#each results}}
+			{{> reviewtile}}
+		{{/each}}
     </div>
 
     <div class="reviews_page_misc">
