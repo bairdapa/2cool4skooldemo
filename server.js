@@ -98,9 +98,40 @@ app.get('/searchprofessors',function(req, res, next) {
 });
 
 // search schools
-app.get('/schools',function(req, res, next) {
-	res.status(200);
-	res.render('schools');
+app.get('/searchschools',function(req, res, next) {
+	var url_params = url.parse(req.url, true).query;
+
+	var searchQueryString = "SELECT Schools.schoolId FROM Schools WHERE schoolName = ?";
+
+	var responseJSON = {
+		found: false,
+		id: -1
+	};
+
+	if(url_params.schoolname == null)
+	{
+		res.status(200).json(responseJSON);	
+		return;
+	}
+
+	mysql.pool.query(searchQueryString, url_params.schoolname, function(err, rows, fields) {
+		if(err) {
+			console.log("sql error in school search endpoint:\n");
+			console.log(err);
+			res.status(500).json(responseJSON);
+			return;
+		}	
+		else if(rows.length == 0)
+		{
+			res.status(200).json(responseJSON);
+			return;
+		}
+		else {
+			responseJSON.found = true;
+			responseJSON.id = rows[0].schoolId;
+			res.status(200).json(responseJSON);
+		}
+	});
 });
 
 // school reviews

@@ -32,4 +32,23 @@ $(document).ready(function() {
 			}
 		});
 	});
+
+	$("#school_search_button").click(function() {
+		var name = document.getElementById("school_search_textbox").value;
+	
+		$.get("searchschools?schoolname=" + name, function(data, status) {
+			if(status == "success") {
+				if(data.found) {
+					window.location.href = "schoolreviews?id=" + data.id;
+				}
+				else
+				{
+					alert("the school you searched for is not in the database, please refine your search");
+				}
+			}
+			else {
+				alert("search request caused an error on the server!");
+			}
+		});
+	});
 });
