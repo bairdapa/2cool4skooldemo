@@ -4,6 +4,7 @@ var handlebars = require('express-handlebars').create({defaultLayout:'page'});
 var path = require('path');
 var mysql = require('./dbcon.js');
 var url = require('url');
+var bodyParser = require('body-parser');
 
 
 // set up app
@@ -13,6 +14,8 @@ app.set('view engine', 'handlebars');
 app.set('port', process.argv[2]);
 
 app.use(express.static('public'));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 
 function convert_rating(rating) {
 	switch(rating) {
@@ -58,6 +61,69 @@ app.get('/createaccount',function(req, res, next) {
 app.get('/createreview',function(req, res, next) {
 	res.status(200);
 	res.render('createreview');
+});
+
+// create review post request
+app.post('/createreview', function(req, res, next) {
+	var createReviewQueryString;
+	var createIntersectionQueryString;
+
+	var data1 = [parseInt(req.body.review_rating), req.body.justification, 17, parseInt(req.body.target_id)];
+	var data2 = [17, parseInt(req.body.target_id)];
+	if(req.body.review_type == "prof") {
+		createReviewQueryString = "INSERT INTO Reviews (rating, justification, userId, schoolId, professorId) VALUES ( ? , ? , ? , NULL, ? )";
+		createIntersectionQueryString = "INSERT INTO UserProfessorIntersections (reviewId, userId, professorId) VALUES ((SELECT reviewId FROM Reviews WHERE reviewId = @@Identity), ? , ? )";
+	}
+	else {
+		createReviewQueryString = "INSERT INTO Reviews (rating, justification, userId, schoolId, professorId) VALUES ( ? , ? , ? , ? , NULL);";
+		createIntersectionQueryString = "INSERT INTO UserSchoolIntersections (reviewId, userId, schoolId) VALUES ((SELECT reviewId FROM Reviews WHERE reviewId = @@Identity), ? , ? );";
+	}
+
+	mysql.pool.getConnection(function(err, connection) {
+		connection.beginTransaction(function(err) {
+			if(err) { //transaction error
+				connection.rollback(function() {
+					connection.release();
+					console.log("error init transaction:\n" + err);
+				});
+			}
+			else {
+				connection.query(createReviewQueryString, data1, function(err, results) {
+					if(err) { //transaction error
+						connection.rollback(function() {
+							connection.release();
+							console.log("error q1 of transaction:\n" + err + "\n" + data1);
+						});
+					}
+					else {
+						connection.query(createIntersectionQueryString, data2, function(err, results) {
+							if(err) { //transaction error
+								connection.rollback(function() {
+									connection.release();
+									console.log("error q2 of transaction:\n" + err + "\n" + data2);
+								});
+							}
+							else {
+								connection.commit(function(err) {
+									if(err) { //transaction error
+										connection.rollback(function() {
+											connection.release();
+											console.log("error commit transaction:\n" + err);
+										});
+									}
+									else {
+										connection.release();
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+	});
+
+	res.status(200).json(req.body);
 });
 
 // search professors
@@ -137,18 +203,18 @@ app.get('/searchschools',function(req, res, next) {
 // school reviews
 app.get('/schoolreviews',function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
-	
+
 	var reviewQueryString = "SELECT * FROM Reviews INNER JOIN Schools ON Schools.schoolId = Reviews.schoolId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.schoolId = ?";
 	var schoolQueryString = "SELECT * FROM Schools INNER JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE Schools.schoolId = ?";
 
 	var sdata = {};
-	
+
 	if(url_params.id == null)
 	{
 		res.status(404).render('404');
 		return;
 	}
-		
+
 	mysql.pool.query(schoolQueryString, url_params.id, function(err, rows, fields) {
 		if(err) {
 			console.log("sql error on schoolreviews endpoint:\n");
@@ -206,7 +272,7 @@ app.get('/professorreviews',function(req, res, next) {
 		res.status(404).render('404');
 		return;
 	}
-	
+
 	mysql.pool.query(profQueryString, url_params.id, function(err, rows, fields) {
 		if(err) {
 			console.log("sql error on professorreviews endpoint:\n");
@@ -224,7 +290,7 @@ app.get('/professorreviews',function(req, res, next) {
 			pdata = rows[0];
 		}
 	});
-	
+
 	mysql.pool.query(reviewQueryString, url_params.id, function(err, rows, fields) {
 		if(err) {
 			console.log("sql error on professorreviews endpoint:\n");
