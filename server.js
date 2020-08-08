@@ -100,6 +100,7 @@ app.get('/loginrequest', function(req, res, next) {
 			responseJSON.session_key = new_key;
 			res.status(200).json(responseJSON);
 		}
+		res.status(200).json(responseJSON);
 	});
 });
 

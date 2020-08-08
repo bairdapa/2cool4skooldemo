@@ -35,6 +35,13 @@ function create_review(type, id, rating, just)
 }
 
 $(document).ready(function() {
+	if(sessionStorage.getItem("session_key") != null) {
+		$("#logincreate").css("display", "none");
+		$("#logged_in_user").text(sessionStorage.getItem("user"));
+		$("#logout").css("display", "block");
+	}
+
+	
 	$("#prof_search_button").click(function() {
 		var full_name = document.getElementById("prof_search_textbox").value;
 		var name_arr = full_name.split(" ");
@@ -212,8 +219,10 @@ $(document).ready(function() {
 		$.get("loginrequest?fname=" + fname + "&lname=" + lname, function(data, status) {
 			if(status == "success") {
 				if(data.success) {
-					alert("logged in\nname: " + data.user + "\nsess: " + data.session_key);
-					// todo add session storage
+					alert("logged in\nname: " + data.user);
+					sessionStorage.setItem("session_key", data.session_key);
+					sessionStorage.setItem("user", data.user);
+					window.location.href = "/";
 				}
 				else {
 					alert("not logged in, something went wrong");
@@ -223,6 +232,12 @@ $(document).ready(function() {
 				alert("not logged in, something went wrong");
 			}
 		});
+	});
+
+	$("#logout_button").click(function() {
+		sessionStorage.removeItem("session_key");
+		sessionStorage.removeItem("user");
+		window.location.href = "/";
 	});
 
 });
