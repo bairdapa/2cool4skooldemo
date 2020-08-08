@@ -73,7 +73,7 @@ app.get('/login',function(req, res, next) {
 // login request
 app.get('/loginrequest', function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
-	var searchQueryString = "SELECT id FROM Users WHERE Users.fName = ? AND Users.lNAme = ?";
+	var searchQueryString = "SELECT Users.userId FROM Users WHERE Users.fName = ? AND Users.lNAme = ?";
 
 	responseJSON = {
 		success: false,
@@ -81,8 +81,7 @@ app.get('/loginrequest', function(req, res, next) {
 		session_key: null
 	};
 
-	if(url_params.fname == null || url_params.lname == null)
-	{
+	if(url_params.fname == null || url_params.lname == null) {
 		res.status(200).json(responseJSON);	
 		return;
 	}
@@ -90,18 +89,19 @@ app.get('/loginrequest', function(req, res, next) {
 	mysql.pool.query(searchQueryString, [url_params.fname, url_params.lname], function(err, rows, fields) {
 		if(err) {
 			res.status(500).json(responseJSON);
-			console.log("sql error while finding use to log in");
+			console.log("sql error while finding user to log in");
+			console.log(err);
 		}
 		else if (rows.length > 0){
 			var new_key = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 			sessions[new_key] = Date.now() + (1000*60*60);
 			responseJSON.success = true;
-			responseJSON.user = url_params.fname + " " url_params.lname;
+			responseJSON.user = url_params.fname + " " + url_params.lname;
 			responseJSON.session_key = new_key;
 			res.status(200).json(responseJSON);
 		}
 	});
-}
+});
 
 // create account
 app.get('/createaccount',function(req, res, next) {

@@ -207,12 +207,12 @@ $(document).ready(function() {
 
 	$("#submit_login").click(function() {
 		var fname = $("#login_fname").val();
-		var nlane = $("#login_lname").val();
+		var lname = $("#login_lname").val();
 
 		$.get("loginrequest?fname=" + fname + "&lname=" + lname, function(data, status) {
-			if(status == success) {
+			if(status == "success") {
 				if(data.success) {
-					alert("logged in\nname: " + data.user = "\nsess: " + data.session_key);
+					alert("logged in\nname: " + data.user + "\nsess: " + data.session_key);
 					// todo add session storage
 				}
 				else {
@@ -222,7 +222,7 @@ $(document).ready(function() {
 			else {
 				alert("not logged in, something went wrong");
 			}
-		}
+		});
 	});
 
 });
