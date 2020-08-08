@@ -22,7 +22,7 @@ function create_review(type, id, rating, just)
 		review_rating: rating,
 		justification: just
 	}
-		
+
 	$.post("createreview", data, function(data, status) {
 		if(status == "success") {
 			alert("created review successfully");
@@ -41,7 +41,7 @@ $(document).ready(function() {
 		$("#logout").css("display", "block");
 	}
 
-	
+
 	$("#prof_search_button").click(function() {
 		var full_name = document.getElementById("prof_search_textbox").value;
 		var name_arr = full_name.split(" ");
@@ -240,4 +240,24 @@ $(document).ready(function() {
 		window.location.href = "/";
 	});
 
+	$(".modify_review_button").each(function() {
+		var name = $(this).parent().parent().find(".review_header").find(".review_name").text();
+		if(name.toLowerCase() == sessionStorage.getItem("user").toLowerCase()) {
+			$(this).css("display", "block");
+		}
+		if($(this).attr('id') == "delete_review") {
+			$(this).click(function() {
+				var id = $(this).parent().find("#review_id").text();
+				var session_key = sessionStorage.getItem("session_key"); 
+				$.get("deletereview?session_key=" + session_key + "&id=" + id, function(data, status) {
+					if(status == "success") {
+						location.reload();
+					}
+					else {
+						alert("unable to delete review");
+					}
+				});	
+			});
+		}
+	});
 });

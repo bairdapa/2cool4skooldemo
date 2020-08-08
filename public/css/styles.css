@@ -134,6 +134,7 @@ div.create_account_misc, div.create_review_misc, div.login_misc, div.user_profil
 	right: 50px;
 	top: 600px;
 	height: 300px;
+	z-index: -1;
 }
 
 div.reviews_page_container {

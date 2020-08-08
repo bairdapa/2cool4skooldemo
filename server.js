@@ -100,7 +100,9 @@ app.get('/loginrequest', function(req, res, next) {
 			responseJSON.session_key = new_key;
 			res.status(200).json(responseJSON);
 		}
-		res.status(200).json(responseJSON);
+		else {
+			res.status(200).json(responseJSON);
+		}
 	});
 });
 
@@ -367,6 +369,83 @@ app.get('/professorreviews',function(req, res, next) {
 			});
 		}
 	});
+});
+
+// delete review
+app.get('/deletereview', function(req, res, next) {
+	var url_params = url.parse(req.url, true).query;
+	var reviewTypeQueryString = "SELECT Reviews.professorId FROM Reviews WHERE Reviews.reviewId = ?";
+	var deleteQueryString1;
+	var deleteQueryString2 = "DELETE FROM Reviews WHERE Reviews.reviewId = ?";
+
+	if(check_session_key(url_params.session_key)) {
+		mysql.pool.query(reviewTypeQueryString, url_params.id, function(err, rows, fields) {
+			if(err) {
+				console.log("sql error detecting review type for deletion");
+				console.log(err);
+			}
+			else
+			{
+				if(rows[0].professorId != null) {
+					// prof review
+					deleteQueryString1 = "DELETE FROM UserProfessorIntersections WHERE reviewId = ?"
+				}
+				else {
+					// school review
+					deleteQueryString1 = "DELETE FROM UserSchoolIntersections WHERE reviewId = ?"
+				}
+
+
+				mysql.pool.getConnection(function(err, connection) {
+					connection.beginTransaction(function(err) {
+						if(err) { //transaction error
+							connection.rollback(function() {
+								connection.release();
+								console.log("error init transaction:\n" + err);
+							});
+						}
+						else {
+							connection.query(deleteQueryString1, url_params.id, function(err, results) {
+								if(err) { //transaction error
+									connection.rollback(function() {
+										connection.release();
+										console.log("error q1 of transaction:\n" + err);
+									});
+								}
+								else {
+									connection.query(deleteQueryString2, url_params.id, function(err, results) {
+										if(err) { //transaction error
+											connection.rollback(function() {
+												connection.release();
+												console.log("error q2 of transaction:\n" + err);
+											});
+										}
+										else {
+											connection.commit(function(err) {
+												if(err) { //transaction error
+													connection.rollback(function() {
+														connection.release();
+														console.log("error commit transaction:\n" + err);
+													});
+												}
+												else {
+													connection.release();
+													res.status(200).end();
+												}
+											});
+										}
+									});
+								}
+							});
+						}
+					});
+				});
+			}
+		});
+	}
+	else {
+		res.status(403).end();
+	}
 });
 
 // user
