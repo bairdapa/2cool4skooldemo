@@ -240,4 +240,11 @@ $(document).ready(function() {
 		window.location.href = "/";
 	});
 
+	$(".modify_review_button").each(function() {
+		var name = $(this).parent().parent().find(".review_header").find(".review_name").text();
+		if(name == sessionStorage.getItem("user")) {
+			$(this).css("display", "block");
+		}
+	});
+
 });
