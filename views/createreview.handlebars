@@ -5,24 +5,33 @@
     </div>
 
     <div class="create_review_form">
-        <form>
-	    <label>Name of School/Professor</label>
-	    <input type="text" id="reviewname" name="reviewname"><br><br>
-	    <input type="radio" id="professor" name="reviewtype" value="professor">	
-	    <label for="professor">Professor</label><br><br>
-	    <input type="radio" id="school" name="reviewtype" value="school">	
-	    <label for="school">School</label><br><br>
-	    <label for="rating">Rating</label>
-	    <input type="range" id="rating" name="rating" min="0" max="10"><br><br>
-	    <label for="justification">Justification</label><br>
-	    <textarea id="justification" name="justification" rows="4" cols="50"></textarea><br><br>
-	    <input type="submit" value="Submit">
-	    </form>
+		<a class="normal_text">Create a review for a:</a><br>
+		<br>
+		<input type="radio" id="radio_school" name="review_type" value="school">
+		<label for="radio_school" class="normal_text">School</label><br>
+		<input type="radio" id="radio_prof" name="review_type" value="prof">
+		<label for="radio_prof" class="normal_text">Professor</label><br>
+		<br>
+		<input type="text" id="create_review_textbox" class="create_review_textbox" placeholder="school or professor name">
+		<br>
+		<button id="create_review_1star" class="create_review_star_button">☆</button> 
+		<button id="create_review_2star" class="create_review_star_button">☆</button> 
+		<button id="create_review_3star" class="create_review_star_button">☆</button> 
+		<button id="create_review_4star" class="create_review_star_button">☆</button> 
+		<button id="create_review_5star" class="create_review_star_button">☆</button> 
+		<br>
+		<textarea class="create_review_justification" id="create_review_justification" placeholder="justify your review here"></textarea>
+		<br>
+		<br>
+		<button id="submit_review" class="submit_review">Submit Review</button>
     </div>
 
     <div class="create_review_misc">
-        <a class="normal text"> Notes for peer reviewers:
-When creating a review, an entry is also added to either the UserProfessorIntersections table or the UserSchoolIntersections table. This is done using foreign keys. See the Data Manipulation Queries in the .zip for more info.</a>
-	    <a class="normal text">This page will modify the Reviews table</a>
+		<br>
+		<br>
+		<br>
+        <a class="normal_text"> Notes for peer reviewers:
+When creating a review, an entry is also added to either the UserProfessorIntersections table or the UserSchoolIntersections table. This is done using foreign keys. See the Data Manipulation Queries in the .zip for more info.</a><br>
+	    <a class="normal_text">This page will modify the Reviews table</a>
     </div>
 </div>
