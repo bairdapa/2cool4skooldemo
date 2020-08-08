@@ -6,6 +6,9 @@ var mysql = require('./dbcon.js');
 var url = require('url');
 var bodyParser = require('body-parser');
 
+// set up login functionality
+var sessions = {}
+
 
 // set up app
 var app = express();
@@ -35,6 +38,22 @@ function convert_rating(rating) {
 	return "☆☆☆☆☆";
 }
 
+function check_session_key(session_key) {
+	var valid = false;
+	for(var key in sessions) {
+		if(sessions.hasOwnProperty(key)) {
+			if(sessions[session_key] < Date.now()) {
+				delete sessions[session_key];
+			}
+			else
+			{
+				valid = true;
+			}
+		}
+	}
+	return valid;
+}
+
 /* 
  * Endpoints
  */
@@ -50,6 +69,39 @@ app.get('/login',function(req, res, next) {
 	res.status(200);
 	res.render('login');
 });
+
+// login request
+app.get('/loginrequest', function(req, res, next) {
+	var url_params = url.parse(req.url, true).query;
+	var searchQueryString = "SELECT id FROM Users WHERE Users.fName = ? AND Users.lNAme = ?";
+
+	responseJSON = {
+		success: false,
+		user: "",
+		session_key: null
+	};
+
+	if(url_params.fname == null || url_params.lname == null)
+	{
+		res.status(200).json(responseJSON);	
+		return;
+	}
+
+	mysql.pool.query(searchQueryString, [url_params.fname, url_params.lname], function(err, rows, fields) {
+		if(err) {
+			res.status(500).json(responseJSON);
+			console.log("sql error while finding use to log in");
+		}
+		else if (rows.length > 0){
+			var new_key = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+			sessions[new_key] = Date.now() + (1000*60*60);
+			responseJSON.success = true;
+			responseJSON.user = url_params.fname + " " url_params.lname;
+			responseJSON.session_key = new_key;
+			res.status(200).json(responseJSON);
+		}
+	});
+}
 
 // create account
 app.get('/createaccount',function(req, res, next) {
