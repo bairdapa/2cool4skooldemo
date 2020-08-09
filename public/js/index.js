@@ -226,7 +226,7 @@ $(document).ready(function() {
 
 					for(var i = 1; i <= 5; i++) {
 						var button = tile.find(".review_header").find("#create_review_" + i + "star");
-						button.css("display", "inline");
+						button.css("display", "block");
 						if(i <= create_review_rating) {
 							button.html("★");
 						}
