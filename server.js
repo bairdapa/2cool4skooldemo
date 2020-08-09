@@ -42,7 +42,7 @@ function check_session_key(session_key) {
 	var valid = false;
 	for(var key in sessions) {
 		if(sessions.hasOwnProperty(key)) {
-			if(sessions[session_key] < Date.now()) {
+			if(sessions[session_key].expiry < Date.now()) {
 				delete sessions[session_key];
 			}
 			else
@@ -94,7 +94,12 @@ app.get('/loginrequest', function(req, res, next) {
 		}
 		else if (rows.length > 0){
 			var new_key = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-			sessions[new_key] = Date.now() + (1000*60*60);
+			var new_session_val = {
+				expiry: Date.now() + (1000*60*60),
+				id: rows[0].userId
+			};
+
+			sessions[new_key] = new_session_val;
 			responseJSON.success = true;
 			responseJSON.user = url_params.fname + " " + url_params.lname;
 			responseJSON.session_key = new_key;
@@ -120,11 +125,18 @@ app.get('/createreview',function(req, res, next) {
 
 // create review post request
 app.post('/createreview', function(req, res, next) {
+	if(!check_session_key(req.body.session_key)) {
+		res.status(403).end();
+		return;
+	}
+
 	var createReviewQueryString;
 	var createIntersectionQueryString;
 
-	var data1 = [parseInt(req.body.review_rating), req.body.justification, 17, parseInt(req.body.target_id)];
-	var data2 = [17, parseInt(req.body.target_id)];
+	var userId = sessions[req.body.session_key].id;
+
+	var data1 = [parseInt(req.body.review_rating), req.body.justification, userId, parseInt(req.body.target_id)];
+	var data2 = [userId, parseInt(req.body.target_id)];
 	if(req.body.review_type == "prof") {
 		createReviewQueryString = "INSERT INTO Reviews (rating, justification, userId, schoolId, professorId) VALUES ( ? , ? , ? , NULL, ? )";
 		createIntersectionQueryString = "INSERT INTO UserProfessorIntersections (reviewId, userId, professorId) VALUES ((SELECT reviewId FROM Reviews WHERE reviewId = @@Identity), ? , ? )";

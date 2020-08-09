@@ -20,7 +20,8 @@ function create_review(type, id, rating, just)
 		review_type: type,
 		target_id: id,
 		review_rating: rating,
-		justification: just
+		justification: just,
+		session_key: sessionStorage.getItem("session_key")
 	}
 
 	$.post("createreview", data, function(data, status) {
@@ -39,6 +40,8 @@ $(document).ready(function() {
 		$("#logincreate").css("display", "none");
 		$("#logged_in_user").text(sessionStorage.getItem("user"));
 		$("#logout").css("display", "block");
+		$("#home_create_review").text("Create Review");
+		$("#home_create_review").attr("href", "createreview");
 	}
 
 
