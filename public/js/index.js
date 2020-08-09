@@ -84,78 +84,29 @@ $(document).ready(function() {
 		});
 	});
 
-	$("#create_review_1star").click(function() {
-		if(create_review_rating != 1) {
-			$("#create_review_1star").html("★");
-			create_review_rating = 1;
-		}
-		else {
-			$("#create_review_1star").html("☆");
-			create_review_rating = 0;
-		}
-		$("#create_review_2star").html("☆");
-		$("#create_review_3star").html("☆");
-		$("#create_review_4star").html("☆");
-		$("#create_review_5star").html("☆");
-	});
+	$(".create_review_star_button").each(function() {
+		for(var i = 1; i <= 5; i++) {
+			if($(this).attr('id') == "create_review_" + i + "star") {
+				alert(i);
+				$(this).click(function() {
+					for(var j = 1; j < i; j++) {
+						$(this).parent().find("#create_review_" + j + "star").html("★");
+					}
 
-	$("#create_review_2star").click(function() {
-		$("#create_review_1star").html("★");
-		if(create_review_rating != 2) {
-			$("#create_review_2star").html("★");
-			create_review_rating = 2;
-		}
-		else {
-			$("#create_review_2star").html("☆");
-			create_review_rating = 1;
-		}
-		$("#create_review_3star").html("☆");
-		$("#create_review_4star").html("☆");
-		$("#create_review_5star").html("☆");
-	});
+					if(create_review_rating != i) {
+						$(this).parent().find("#create_review_" + i + "star").html("★");
+						create_review_rating = i;
+					}
+					else {
+						$(this).parent().find("#create_review_" + i + "star").html("☆");
+						create_review_rating = i - 1;
+					}
 
-	$("#create_review_3star").click(function() {
-		$("#create_review_1star").html("★");
-		$("#create_review_2star").html("★");
-		if(create_review_rating != 3) {
-			$("#create_review_3star").html("★");
-			create_review_rating = 3;
-		}
-		else {
-			$("#create_review_3star").html("☆");
-			create_review_rating = 2;
-		}
-		$("#create_review_4star").html("☆");
-		$("#create_review_5star").html("☆");
-	});
-
-	$("#create_review_4star").click(function() {
-		$("#create_review_1star").html("★");
-		$("#create_review_2star").html("★");
-		$("#create_review_3star").html("★");
-		if(create_review_rating != 4) {
-			$("#create_review_4star").html("★");
-			create_review_rating = 4;
-		}
-		else {
-			$("#create_review_4star").html("☆");
-			create_review_rating = 3;
-		}
-		$("#create_review_5star").html("☆");
-	});
-
-	$("#create_review_5star").click(function() {
-		$("#create_review_1star").html("★");
-		$("#create_review_2star").html("★");
-		$("#create_review_3star").html("★");
-		$("#create_review_4star").html("★");
-		if(create_review_rating != 5) {
-			$("#create_review_5star").html("★");
-			create_review_rating = 5;
-		}
-		else {
-			$("#create_review_5star").html("☆");
-			create_review_rating = 4;
+					for(var j = i+1; j <= 5; j++) {
+						$(this).parent().find("#create_review_" + j + "star").html("☆");
+					}
+				});
+			}
 		}
 	});
 
@@ -246,21 +197,30 @@ $(document).ready(function() {
 	$(".modify_review_button").each(function() {
 		var name = $(this).parent().parent().find(".review_header").find(".review_name").text();
 		if(name.toLowerCase() == sessionStorage.getItem("user").toLowerCase()) {
-			$(this).css("display", "block");
-		}
-		if($(this).attr('id') == "delete_review") {
-			$(this).click(function() {
-				var id = $(this).parent().find("#review_id").text();
-				var session_key = sessionStorage.getItem("session_key"); 
-				$.get("deletereview?session_key=" + session_key + "&id=" + id, function(data, status) {
-					if(status == "success") {
-						location.reload();
-					}
-					else {
-						alert("unable to delete review");
-					}
-				});	
-			});
+			if($(this).attr('id') == "delete_review") {
+				$(this).css("display", "block");
+				$(this).click(function() {
+					var id = $(this).parent().find("#review_id").text();
+					var session_key = sessionStorage.getItem("session_key"); 
+					$.get("deletereview?session_key=" + session_key + "&id=" + id, function(data, status) {
+						if(status == "success") {
+							location.reload();
+						}
+						else {
+							alert("unable to delete review");
+						}
+					});	
+				});
+			}
+			else if($(this).attr('id') == "edit_review") {
+				$(this).css("display", "block");
+				$(this).click(function() {
+					$(this).css("display", "none");
+					$(this).parent().find("#submit_edit_review").css("display", "block");
+					$(this).parent().parent().find(".review_body").find("#edit_review_text").css("display", "block");
+					$(this).parent().parent().find(".review_body").find("#review_text").css("display", "none");
+				});
+			}
 		}
 	});
 });

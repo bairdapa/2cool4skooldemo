@@ -4,14 +4,17 @@
 			<img class="review_image" src="{{pictureURL}}" alt="Reviewer Profile Image">
 			<button class="modify_review_button" id="delete_review" style="display:none">Delete</button>
 			<button class="modify_review_button" id="edit_review" style="display:none">Edit</button>
+			<button class="modify_review_button" id="submit_edit_review" style="display:none">Submit Edits</button>
 			<a id="review_id" style="display:none;">{{reviewId}}</a>
+			<a id="review_rating" style="display:none;">{{ratingNum}}</a>
 		</div>
 		<div class="review_header">
 			<a class="review_name">{{fName}} {{lName}}</a>
 			<a class="review_rating">{{rating}}</a>
 		</div>
 		<div class="review_body">
-			<p class="normal_text">{{justification}}</p>
+			<p id="review_text" class="normal_text">{{justification}}</p>
+			<textarea class="edit_review_text" id="edit_review_text" style="display:none;">{{justification}}</textarea>
 		</div>
 	</div>
 </div>

@@ -312,6 +312,7 @@ app.get('/schoolreviews',function(req, res, next) {
 			for(var i = 0; i < rows.length; i++)
 			{
 				rating_counter += rows[i].rating;
+				rows[i].ratingNum = rows[i].rating;
 				rows[i].rating = convert_rating(rows[i].rating);
 			}
 			sdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
@@ -370,6 +371,7 @@ app.get('/professorreviews',function(req, res, next) {
 			for(var i = 0; i < rows.length; i++)
 			{
 				rating_counter += rows[i].rating;
+				rows[i].ratingNum = rows[i].rating;
 				rows[i].rating = convert_rating(rows[i].rating);
 			}
 			pdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
