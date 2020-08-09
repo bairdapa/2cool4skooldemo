@@ -6,7 +6,7 @@ var mysql = require('./dbcon.js');
 var url = require('url');
 var bodyParser = require('body-parser');
 
-// set up login functionality
+// dictionary of currently logged in users
 var sessions = {}
 
 
@@ -20,6 +20,8 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
+
+// helper functions
 function convert_rating(rating) {
 	switch(rating) {
 		case 0:
@@ -334,30 +336,30 @@ app.get('/schoolreviews',function(req, res, next) {
 		else
 		{
 			sdata = rows[0];
-		}
-	});
 
-	mysql.pool.query(reviewQueryString, url_params.id, function(err, rows, fields) {
-		if(err) {
-			console.log("sql error on schoolreviews endpoint:\n");
-			console.log(err);
-			res.status(500).render('500');
-		}
-		else
-		{
-			var rating_counter = 0;
-			for(var i = 0; i < rows.length; i++)
-			{
-				rating_counter += rows[i].rating;
-				rows[i].ratingNum = rows[i].rating;
-				rows[i].rating = convert_rating(rows[i].rating);
-			}
-			sdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
+			mysql.pool.query(reviewQueryString, url_params.id, function(err, rows, fields) {
+				if(err) {
+					console.log("sql error on schoolreviews endpoint:\n");
+					console.log(err);
+					res.status(500).render('500');
+				}
+				else
+				{
+					var rating_counter = 0;
+					for(var i = 0; i < rows.length; i++)
+					{
+						rating_counter += rows[i].rating;
+						rows[i].ratingNum = rows[i].rating;
+						rows[i].rating = convert_rating(rows[i].rating);
+					}
+					sdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
 
-			res.status(200);
-			res.render('schoolreviews', {
-				results: rows,
-				schooldata: sdata
+					res.status(200);
+					res.render('schoolreviews', {
+						results: rows,
+						schooldata: sdata
+					});
+				}
 			});
 		}
 	});
@@ -393,30 +395,30 @@ app.get('/professorreviews',function(req, res, next) {
 		else
 		{
 			pdata = rows[0];
-		}
-	});
 
-	mysql.pool.query(reviewQueryString, url_params.id, function(err, rows, fields) {
-		if(err) {
-			console.log("sql error on professorreviews endpoint:\n");
-			console.log(err);
-			res.status(500).render('500');
-		}
-		else
-		{
-			var rating_counter = 0;
-			for(var i = 0; i < rows.length; i++)
-			{
-				rating_counter += rows[i].rating;
-				rows[i].ratingNum = rows[i].rating;
-				rows[i].rating = convert_rating(rows[i].rating);
-			}
-			pdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
+			mysql.pool.query(reviewQueryString, url_params.id, function(err, rows, fields) {
+				if(err) {
+					console.log("sql error on professorreviews endpoint:\n");
+					console.log(err);
+					res.status(500).render('500');
+				}
+				else
+				{
+					var rating_counter = 0;
+					for(var i = 0; i < rows.length; i++)
+					{
+						rating_counter += rows[i].rating;
+						rows[i].ratingNum = rows[i].rating;
+						rows[i].rating = convert_rating(rows[i].rating);
+					}
+					pdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
 
-			res.status(200);
-			res.render('professorreviews', {
-				results: rows,
-				profdata: pdata
+					res.status(200);
+					res.render('professorreviews', {
+						results: rows,
+						profdata: pdata
+					});
+				}
 			});
 		}
 	});

@@ -44,6 +44,23 @@ $(document).ready(function() {
 		$("#home_create_review").attr("href", "createreview");
 	}
 
+	$("#prof_search_textbox").keypress(function(e) {
+		if(e.keyCode == 13) {
+			$("#prof_search_button").click();
+		}
+	});
+	
+	$("#school_search_textbox").keypress(function(e) {
+		if(e.keyCode == 13) {
+			$("#school_search_button").click();
+		}
+	});
+
+	$("#login_lname").keypress(function(e) {
+		if(e.keyCode == 13) {
+			$("#submit_login").click();
+		}
+	});
 
 	$("#prof_search_button").click(function() {
 		var full_name = document.getElementById("prof_search_textbox").value;
@@ -172,6 +189,8 @@ $(document).ready(function() {
 	$("#submit_login").click(function() {
 		var fname = $("#login_fname").val();
 		var lname = $("#login_lname").val();
+		fname = fname[0].toUpperCase() + fname.slice(1);
+		lname = lname[0].toUpperCase() + lname.slice(1);
 
 		$.get("loginrequest?fname=" + fname + "&lname=" + lname, function(data, status) {
 			if(status == "success") {
