@@ -80,6 +80,7 @@ app.get('/loginrequest', function(req, res, next) {
 	responseJSON = {
 		success: false,
 		user: "",
+		id: -1,
 		session_key: null
 	};
 
@@ -105,6 +106,7 @@ app.get('/loginrequest', function(req, res, next) {
 			responseJSON.success = true;
 			responseJSON.user = url_params.fname + " " + url_params.lname;
 			responseJSON.session_key = new_key;
+			responseJSON.id = rows[0].userId;
 			res.status(200).json(responseJSON);
 		}
 		else {
@@ -351,6 +353,7 @@ app.get('/schoolreviews',function(req, res, next) {
 						rating_counter += rows[i].rating;
 						rows[i].ratingNum = rows[i].rating;
 						rows[i].rating = convert_rating(rows[i].rating);
+						rows[i].link = "user?id=" + rows[i].userId;
 					}
 					sdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
 
@@ -410,6 +413,7 @@ app.get('/professorreviews',function(req, res, next) {
 						rating_counter += rows[i].rating;
 						rows[i].ratingNum = rows[i].rating;
 						rows[i].rating = convert_rating(rows[i].rating);
+						rows[i].link = "user?id=" + rows[i].userId;
 					}
 					pdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
 
@@ -502,11 +506,67 @@ app.get('/deletereview', function(req, res, next) {
 });
 
 
-
 // user
 app.get('/user',function(req, res, next) {
-	res.status(200);
-	res.render('user');
+	var url_params = url.parse(req.url, true).query;
+
+	var reviewQueryString = "SELECT Professors.fName, Professors.lName, Professors.pictureURL AS profPictureURL, Schools.pictureURL, Reviews.rating, Reviews.justification, Reviews.professorId, Reviews.schoolId, Reviews.userId, Schools.schoolName FROM Reviews LEFT JOIN Professors ON Professors.professorId = Reviews.professorId LEFT JOIN Schools ON Schools.schoolId = Reviews.schoolId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.userId= ?";
+	var userQueryString = "SELECT Users.pictureURL, Users.fName, Users.lName, Users.biography, Worlds.worldName FROM Users INNER JOIN Worlds ON Worlds.worldId = Users.worldId WHERE Users.userId = ?";
+
+	var udata = {};
+
+	if (url_params.id == null){
+		res.status(404).render('404');
+		return;
+	}
+
+	mysql.pool.query(userQueryString, url_params.id, function(err, rows, fields) {
+		if(err) {
+			console.log("sql error on userreviews endpoint:\n");
+			console.log(err);
+			res.status(500).render('500');
+			return;
+		}
+		else if (rows.length == 0)
+		{
+			res.status(404).render('404');
+			return;
+		}
+		else
+		{
+			udata = rows[0];
+
+			mysql.pool.query(reviewQueryString, url_params.id, function(err, rows, fields) {
+				if(err) {
+					console.log("sql error on userreviews endpoint:\n");
+					console.log(err);
+					res.status(500).render('500');
+				}
+				else
+				{
+					for (var i = 0; i < rows.length; i++)
+					{
+						rows[i].ratingNum = rows[i].rating;
+						rows[i].rating = convert_rating(rows[i].rating);
+						if(rows[i].profPictureURL != null) {
+							rows[i].pictureURL = rows[i].profPictureURL;
+							rows[i].link = "professorreviews?id=" + rows[i].professorId;
+						}
+						else
+						{
+							rows[i].fName = rows[i].schoolName;
+							rows[i].link = "schoolreviews?id=" + rows[i].schoolId;
+						}
+					}
+					res.status(200);
+					res.render('user', {
+						results: rows,
+						userdata: udata
+					});
+				}
+			});
+		}
+	});
 });
 
 

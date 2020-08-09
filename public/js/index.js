@@ -197,6 +197,7 @@ $(document).ready(function() {
 				if(data.success) {
 					sessionStorage.setItem("session_key", data.session_key);
 					sessionStorage.setItem("user", data.user);
+					sessionStorage.setItem("id", data.id);
 					window.location.href = "/";
 				}
 				else {
@@ -212,14 +213,16 @@ $(document).ready(function() {
 	$("#logout_button").click(function() {
 		sessionStorage.removeItem("session_key");
 		sessionStorage.removeItem("user");
+		sessionStorage.removeItem("id");
 		window.location.href = "/";
 	});
 
 	$(".modify_review_button").each(function() {
 		var tile = $(this).parent().parent();
 		var name = tile.find(".review_header").find(".review_name").text();
-		if(name.toLowerCase() == sessionStorage.getItem("user").toLowerCase()) {
-			var id = $(this).parent().find("#review_id").text();
+		var id = $(this).parent().find("#review_id").text();
+		var uid = $(this).parent().find("#user_id").text();
+		if(uid == sessionStorage.getItem("id")) {
 			if($(this).attr('id') == "delete_review") {
 				$(this).css("display", "block");
 				$(this).click(function() {
