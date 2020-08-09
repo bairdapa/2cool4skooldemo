@@ -85,29 +85,32 @@ $(document).ready(function() {
 	});
 
 	$(".create_review_star_button").each(function() {
-		for(var i = 1; i <= 5; i++) {
-			if($(this).attr('id') == "create_review_" + i + "star") {
-				alert(i);
-				$(this).click(function() {
-					for(var j = 1; j < i; j++) {
-						$(this).parent().find("#create_review_" + j + "star").html("★");
-					}
-
-					if(create_review_rating != i) {
-						$(this).parent().find("#create_review_" + i + "star").html("★");
-						create_review_rating = i;
-					}
-					else {
-						$(this).parent().find("#create_review_" + i + "star").html("☆");
-						create_review_rating = i - 1;
-					}
-
-					for(var j = i+1; j <= 5; j++) {
-						$(this).parent().find("#create_review_" + j + "star").html("☆");
-					}
-				});
+		var i;
+		for(var ind = 1; ind <= 5; ind++) {
+			if($(this).attr('id') == "create_review_" + ind + "star") {
+				i = ind;
+				break;
 			}
 		}
+
+		$(this).click(function() {
+			for(var j = 1; j < i; j++) {
+				$(this).parent().find("#create_review_" + j + "star").html("★");
+			}
+
+			if(create_review_rating != i) {
+				$(this).parent().find("#create_review_" + i + "star").html("★");
+				create_review_rating = i;
+			}
+			else {
+				$(this).parent().find("#create_review_" + i + "star").html("☆");
+				create_review_rating = i - 1;
+			}
+
+			for(var j = i+1; j <= 5; j++) {
+				$(this).parent().find("#create_review_" + j + "star").html("☆");
+			}
+		});
 	});
 
 	$("#submit_review").click(function() {
@@ -173,7 +176,6 @@ $(document).ready(function() {
 		$.get("loginrequest?fname=" + fname + "&lname=" + lname, function(data, status) {
 			if(status == "success") {
 				if(data.success) {
-					alert("logged in\nname: " + data.user);
 					sessionStorage.setItem("session_key", data.session_key);
 					sessionStorage.setItem("user", data.user);
 					window.location.href = "/";
@@ -195,12 +197,13 @@ $(document).ready(function() {
 	});
 
 	$(".modify_review_button").each(function() {
-		var name = $(this).parent().parent().find(".review_header").find(".review_name").text();
+		var tile = $(this).parent().parent();
+		var name = tile.find(".review_header").find(".review_name").text();
 		if(name.toLowerCase() == sessionStorage.getItem("user").toLowerCase()) {
+			var id = $(this).parent().find("#review_id").text();
 			if($(this).attr('id') == "delete_review") {
 				$(this).css("display", "block");
 				$(this).click(function() {
-					var id = $(this).parent().find("#review_id").text();
 					var session_key = sessionStorage.getItem("session_key"); 
 					$.get("deletereview?session_key=" + session_key + "&id=" + id, function(data, status) {
 						if(status == "success") {
@@ -217,8 +220,40 @@ $(document).ready(function() {
 				$(this).click(function() {
 					$(this).css("display", "none");
 					$(this).parent().find("#submit_edit_review").css("display", "block");
-					$(this).parent().parent().find(".review_body").find("#edit_review_text").css("display", "block");
-					$(this).parent().parent().find(".review_body").find("#review_text").css("display", "none");
+					tile.find(".review_body").find("#edit_review_text").css("display", "block");
+					tile.find(".review_body").find("#review_text").css("display", "none");
+					create_review_rating = tile.find(".review_image").find("#review_rating").text();
+
+					for(var i = 1; i <= 5; i++) {
+						var button = tile.find(".review_header").find("#create_review_" + i + "star");
+						button.css("display", "inline");
+						if(i <= create_review_rating) {
+							button.html("★");
+						}
+						else {
+							button.html("☆");
+						}
+					}
+					tile.find(".review_header").find(".review_rating").css("display", "none");
+				});
+			}
+			else if($(this).attr('id') == "submit_edit_review") {
+				$(this).click(function() {
+					var data = {
+						review_id: id,
+						justification: tile.find(".review_body").find("#edit_review_text").val(),
+						rating: create_review_rating,
+						session_key: sessionStorage.getItem("session_key")
+					};
+					
+					$.post("updatereview", data, function(data, status) {
+						if(status == "success") {
+							location.reload();
+						}
+						else {
+							alert("something went wrong, unable to update review");
+						}
+					});
 				});
 			}
 		}

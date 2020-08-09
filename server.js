@@ -123,6 +123,43 @@ app.get('/createreview',function(req, res, next) {
 	res.render('createreview');
 });
 
+// update an existing review
+app.post('/updatereview', function(req, res, next) {
+	if(!check_session_key(req.body.session_key)) {
+		res.status(403).end();
+		return;
+	}
+
+	data = [parseInt(req.body.rating), req.body.justification, parseInt(req.body.review_id)];
+
+	var getIdQueryString = "SELECT userId FROM Reviews WHERE reviewId = ?";
+	var updateQueryString = "UPDATE Reviews SET rating = ? , justification = ? WHERE reviewId = ?";
+
+	mysql.pool.query(getIdQueryString, req.body.review_id, function(err, rows, fields) {
+		if(err) {
+			console.log("error getting id of review for update");
+			console.log(err);
+			res.status(500).end();
+		}
+		else {
+			if(rows.length > 0) {
+				if(sessions[req.body.session_key].id == rows[0].userId) {
+					mysql.pool.query(updateQueryString, data, function(err, rows, fields) {
+						if(err) {
+							console.log("error updating review");
+							console.log(err);
+							res.status(500).end();
+						}
+						else {
+							res.status(200).end();
+						}
+					});
+				}
+			}
+		}
+	});
+});
+
 // create review post request
 app.post('/createreview', function(req, res, next) {
 	if(!check_session_key(req.body.session_key)) {
@@ -461,6 +498,8 @@ app.get('/deletereview', function(req, res, next) {
 		res.status(403).end();
 	}
 });
+
+
 
 // user
 app.get('/user',function(req, res, next) {
