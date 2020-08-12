@@ -103,6 +103,24 @@ app.get('/createprofessor', function(req, res, next) {
 	});
 });
 
+// create professor action
+app.post('createprofessor', function(req, res, next) {
+	var data = [req.body.fname, req.body.lname, req.body.pic, req.body.school, req.body.world];
+
+	var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId, worldId) VALUES ( ? , ? , ? , ? , ? )";
+
+	mysql.pool.query(createProfQuery, data, function(err, rows, fields) {
+		if(err) {
+			console.log("error creating professor");
+			console.log(err);
+			res.status(500).end();
+		}
+		else {
+			res.status(200).end();
+		}
+	});
+});
+
 // create school page
 app.get('/createschool', function(req, res, next) {
 	var getWorldsQuery = "SELECT Worlds.worldId, Worlds.worldName FROM Worlds WHERE 1";
@@ -117,6 +135,24 @@ app.get('/createschool', function(req, res, next) {
 			res.status(200).render('createschool', {
 				worlds: rows
 			});
+		}
+	});
+});
+
+// create schools action
+app.post('createschool', function(req, res, next) {
+	var data = [req.body.name, req.body.pic, req.body.world];
+
+	var createSchoolQuery = "INSERT INTO Schools (schoolName, pictureURL, worldId) VALUES ( ? , ? , ? )";
+
+	mysql.pool.query(createSchoolQuery, data, function(err, rows, fields) {
+		if(err) {
+			console.log("error creating school");
+			console.log(err);
+			res.status(500).end();
+		}
+		else {
+			res.status(200).end();
 		}
 	});
 });
@@ -243,6 +279,7 @@ app.post('/createaccount', function(req, res, next) {
 	});
 });
 
+// browse professors
 app.get('/browseprofessors', function(req, res, next) {
 	var getProfessorsQuery = "SELECT Professors.professorId, Professors.schoolId, Professors.worldId, Professors.fName, Professors.lName, Professors.pictureURL, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Worlds ON Worlds.worldId = Professors.WorldId INNER JOIN Schools ON Schools.schoolId = Professors.schoolId WHERE 1";
 
@@ -264,6 +301,7 @@ app.get('/browseprofessors', function(req, res, next) {
 	});
 });
 
+// browse schools
 app.get('/browseschools', function(req, res, next) {
 	var getSchoolsQuery = "SELECT * FROM Schools INNER JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE 1";
 
