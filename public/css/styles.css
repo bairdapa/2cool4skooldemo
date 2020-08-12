@@ -110,6 +110,15 @@ div.create_account_form, div.login_form, div.create_review_form {
 	text-align: left;
 }
 
+div.create_school_form, div.create_professor_form {
+	position: absolute;
+	top: 300px;
+	width: 500px;
+	left: calc(50% - 250px);
+	text-align: center;
+	
+}
+
 div.centered_search {
 	position: absolute;
 	top:300px;
