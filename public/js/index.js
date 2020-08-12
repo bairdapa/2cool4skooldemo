@@ -217,6 +217,28 @@ $(document).ready(function() {
 		window.location.href = "/";
 	});
 
+	$("#createaccountbutton").click(function() {
+		var data = {
+			fname: $(this).parent().find("#createaccfname").val(),
+			lname: $(this).parent().find("#createacclname").val(),
+			bio: $(this).parent().find("#createaccbio").val(),
+			pic: $(this).parent().find("#createaccpic").val()
+		};
+
+		$.post("createaccount",data,function(data, status){
+			if (status=="success"){
+				sessionStorage.setItem("session_key", data.session_key);
+				sessionStorage.setItem("user", data.user);
+				sessionStorage.setItem("id", data.id);
+				window.location.href="/";
+			}
+			else {
+				alert("Account not created, an error occured");
+			}
+		});
+
+	});
+
 	$(".modify_review_button").each(function() {
 		var tile = $(this).parent().parent();
 		var name = tile.find(".review_header").find(".review_name").text();
