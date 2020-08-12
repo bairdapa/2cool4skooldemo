@@ -72,6 +72,115 @@ app.get('/login',function(req, res, next) {
 	res.render('login');
 });
 
+// create professor page
+app.get('/createprofessor', function(req, res, next) {
+	var getSchoolsQuery = "SELECT Schools.schoolId, Schools.schoolName FROM Schools WHERE 1";
+	var getWorldsQuery = "SELECT Worlds.worldId, Worlds.worldName FROM Worlds WHERE 1";
+
+	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
+		if(err) {
+			console.log("sql error while getting list of schools");
+			console.log(err);
+			res.status(500).end();
+		}
+		else {
+			var schools = rows;
+
+			mysql.pool.query(getWorldsQuery, function(err, rows, fields) {
+				if(err) {
+					console.log("sql error while getting list of worlds");
+					console.log(err);
+					res.status(500).end();
+				}
+				else {
+					res.status(200).render('createprofessor', {
+						worlds: rows,
+						schools: schools
+					});
+				}
+			});
+		}
+	});
+});
+
+// create professor action
+app.post('/createprofessor', function(req, res, next) {
+	var data1 = [req.body.fname, req.body.lname, req.body.pic, req.body.school, req.body.world];
+	var data2 = [req.body.fname, req.body.lname]
+
+	var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId, worldId) VALUES ( ? , ? , ? , ? , ? )";
+	var getProfQuery = "SELECT professorId FROM Professors WHERE fName = ? AND lName = ?";
+
+	mysql.pool.query(createProfQuery, data1, function(err, rows, fields) {
+		if(err) {
+			console.log("error creating professor");
+			console.log(err);
+			res.status(500).end();
+		}
+		else {
+			mysql.pool.query(getProfQuery, data2, function(err, rows, fields) {
+				if(err) {
+					console.log("error looking up professor after creating");
+					console.log(err);
+				}
+				else {
+					res.status(200).json({
+						id: rows[0].professorId	
+					});
+				}
+			});
+		}
+	});
+});
+
+// create school page
+app.get('/createschool', function(req, res, next) {
+	var getWorldsQuery = "SELECT Worlds.worldId, Worlds.worldName FROM Worlds WHERE 1";
+
+	mysql.pool.query(getWorldsQuery, function(err, rows, fields) {
+		if(err) {
+			console.log("sql error while getting list of worlds");
+			console.log(err);
+			res.status(500).end();
+		}
+		else {
+			res.status(200).render('createschool', {
+				worlds: rows
+			});
+		}
+	});
+});
+
+// create schools action
+app.post('/createschool', function(req, res, next) {
+	var data = [req.body.name, req.body.pic, req.body.world];
+
+	var createSchoolQuery = "INSERT INTO Schools (schoolName, pictureURL, worldId) VALUES ( ? , ? , ? )";
+	var getSchoolQuery = "SELECT schoolId FROM Schools WHERE schoolName = ?";
+
+	mysql.pool.query(createSchoolQuery, data, function(err, rows, fields) {
+		if(err) {
+			console.log("error creating school");
+			console.log(err);
+			res.status(500).end();
+		}
+		else {
+			mysql.pool.query(getSchoolQuery, req.body.name, function(err, rows, fields) {
+				if(err) {
+					console.log("error looking up school after creating");
+					console.log(err);
+				}
+				else {
+					res.status(200).json({
+						id: rows[0].schoolId
+					});
+				}
+			});
+		}
+	});
+});
+
+
 // login request
 app.get('/loginrequest', function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
@@ -193,9 +302,10 @@ app.post('/createaccount', function(req, res, next) {
 	});
 });
 
+// browse professors
 app.get('/browseprofessors', function(req, res, next) {
 	var getProfessorsQuery = "SELECT Professors.professorId, Professors.schoolId, Professors.worldId, Professors.fName, Professors.lName, Professors.pictureURL, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Worlds ON Worlds.worldId = Professors.WorldId INNER JOIN Schools ON Schools.schoolId = Professors.schoolId WHERE 1";
-	
+
 	mysql.pool.query(getProfessorsQuery, function(err, rows, fields) {
 		if(err) {
 			console.log("error fetching professor list");
@@ -214,9 +324,10 @@ app.get('/browseprofessors', function(req, res, next) {
 	});
 });
 
+// browse schools
 app.get('/browseschools', function(req, res, next) {
 	var getSchoolsQuery = "SELECT * FROM Schools INNER JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE 1";
-	
+
 	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
 		if(err) {
 			console.log("error fetching school list");
@@ -686,7 +797,6 @@ app.get('/user',function(req, res, next) {
 
 // catch errors (404 and 500)
 app.use(function(req,res){
-	console.log(req);
 	res.status(404);
 	res.render('404');
 });
