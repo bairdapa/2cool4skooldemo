@@ -194,7 +194,7 @@ app.post('/createaccount', function(req, res, next) {
 });
 
 app.get('/browseprofessors', function(req, res, next) {
-	var getProfessorsQuery = "SELECT * FROM Professors WHERE 1";
+	var getProfessorsQuery = "SELECT Professors.professorId, Professors.schoolId, Professors.worldId, Professors.fName, Professors.lName, Professors.pictureURL, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Worlds ON Worlds.worldId = Professors.WorldId INNER JOIN Schools ON Schools.schoolId = Professors.schoolId WHERE 1";
 	
 	mysql.pool.query(getProfessorsQuery, function(err, rows, fields) {
 		if(err) {
@@ -203,6 +203,10 @@ app.get('/browseprofessors', function(req, res, next) {
 		}
 		else
 		{
+			for(var i = 0; i < rows.length; i++)
+			{
+				rows[i].link = 'href=professorreviews?id=' + rows[i].professorId;
+			}
 			res.status(200).render('browseprofessors', {
 				results: rows
 			});
@@ -211,7 +215,7 @@ app.get('/browseprofessors', function(req, res, next) {
 });
 
 app.get('/browseschools', function(req, res, next) {
-	var getSchoolsQuery = "SELECT * Schools FROM WHERE 1";
+	var getSchoolsQuery = "SELECT * FROM Schools INNER JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE 1";
 	
 	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
 		if(err) {
@@ -220,6 +224,10 @@ app.get('/browseschools', function(req, res, next) {
 		}
 		else
 		{
+			for(var i = 0; i < rows.length; i++)
+			{
+				rows[i].link = 'href=schoolreviews?id=' + rows[i].schoolId;
+			}
 			res.status(200).render('browseschools', {
 				results: rows
 			});
@@ -461,7 +469,7 @@ app.get('/schoolreviews',function(req, res, next) {
 						rows[i].rating = convert_rating(rows[i].rating);
 						rows[i].link = "user?id=" + rows[i].userId;
 					}
-					sdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
+					sdata.avgRating = 'Average Rating: ' + convert_rating(Math.ceil(rating_counter / rows.length));
 
 					res.status(200);
 					res.render('schoolreviews', {
@@ -521,7 +529,7 @@ app.get('/professorreviews',function(req, res, next) {
 						rows[i].rating = convert_rating(rows[i].rating);
 						rows[i].link = "user?id=" + rows[i].userId;
 					}
-					pdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
+					pdata.avgRating = 'Average Rating: ' + convert_rating(Math.ceil(rating_counter / rows.length));
 
 					res.status(200);
 					res.render('professorreviews', {
