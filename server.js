@@ -72,6 +72,40 @@ app.get('/login',function(req, res, next) {
 	res.render('login');
 });
 
+// create professor page
+app.get('/createprofessor', function(req, res, next) {
+	var getSchoolsQuery = "SELECT Schools.schoolId, Schools.schoolName FROM Schools WHERE 1";
+	var getWorldsQuery = "SELECT Worlds.worldId, Worlds.worldName FROM Worlds WHERE 1";
+
+	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
+		if(err) {
+			console.log("sql error while getting list of schools");
+			console.log(err);
+			res.status(500).end();
+		}
+		else {
+			var schools = rows;
+
+			mysql.pool.query(getWorldsQuery, function(err, rows, fields) {
+				if(err) {
+					console.log("sql error while getting list of worlds");
+					console.log(err);
+					res.status(500).end();
+				}
+				else {
+					res.status(200).render('createprofessor', {
+						worlds: rows,
+						schools: schools
+					});
+				}
+			});
+		}
+	});
+});
+
+
+// create school page
+
 // login request
 app.get('/loginrequest', function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
@@ -195,7 +229,7 @@ app.post('/createaccount', function(req, res, next) {
 
 app.get('/browseprofessors', function(req, res, next) {
 	var getProfessorsQuery = "SELECT Professors.professorId, Professors.schoolId, Professors.worldId, Professors.fName, Professors.lName, Professors.pictureURL, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Worlds ON Worlds.worldId = Professors.WorldId INNER JOIN Schools ON Schools.schoolId = Professors.schoolId WHERE 1";
-	
+
 	mysql.pool.query(getProfessorsQuery, function(err, rows, fields) {
 		if(err) {
 			console.log("error fetching professor list");
@@ -216,7 +250,7 @@ app.get('/browseprofessors', function(req, res, next) {
 
 app.get('/browseschools', function(req, res, next) {
 	var getSchoolsQuery = "SELECT * FROM Schools INNER JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE 1";
-	
+
 	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
 		if(err) {
 			console.log("error fetching school list");
