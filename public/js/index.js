@@ -239,6 +239,48 @@ $(document).ready(function() {
 
 	});
 
+	$("#create_prof_submit").click() {
+		var data = {
+			fname: $(this).parent().find("#create_prof_fname").val(),
+			lname: $(this).parent().find("#create_prof_lname").val(),
+			pic: $(this).parent().find("#create_prof_pic").val(),
+			school: $(this).parent().find("#create_prof_school").val(),
+			world: $(this).parent().find("#create_prof_world").val()
+		};	
+
+		$.post("createprofessor", data, function(data, status) {
+			if (status == "success")
+			{
+				window.location.href = "/professorreviews?id=" + data.id;
+			}
+			else
+			{
+				alert("professor not created, an error occured");
+			}
+		
+		});
+	});
+
+	$("#create_school_submit").click() {
+		var data = {
+			name: $(this).parent().find("#create_school_name").val(),
+			pic: $(this).parent().find("#create_school_pic").val(),
+			world: $(this).parent().find("#create_school_world").val()
+		};	
+
+		$.post("createschool", data, function(data, status) {
+			if (status == "success")
+			{
+				window.location.href = "/schoolreviews?id=" + data.id;
+			}
+			else
+			{
+				alert("school not created, an error occured");
+			}
+		
+		});
+	});
+
 	$(".modify_review_button").each(function() {
 		var tile = $(this).parent().parent();
 		var name = tile.find(".review_header").find(".review_name").text();

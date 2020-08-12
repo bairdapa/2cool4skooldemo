@@ -105,18 +105,30 @@ app.get('/createprofessor', function(req, res, next) {
 
 // create professor action
 app.post('createprofessor', function(req, res, next) {
-	var data = [req.body.fname, req.body.lname, req.body.pic, req.body.school, req.body.world];
+	var data1 = [req.body.fname, req.body.lname, req.body.pic, req.body.school, req.body.world];
+	var data2 = [req.body.fname, req.body.lname]
 
 	var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId, worldId) VALUES ( ? , ? , ? , ? , ? )";
+	var getProfQuery = "SELECT professorId FROM Professors WHERE fName = ? AND lName = ?";
 
-	mysql.pool.query(createProfQuery, data, function(err, rows, fields) {
+	mysql.pool.query(createProfQuery, data1, function(err, rows, fields) {
 		if(err) {
 			console.log("error creating professor");
 			console.log(err);
 			res.status(500).end();
 		}
 		else {
-			res.status(200).end();
+			mysql.pool.query(getProfQuery, data2, function(err, rows, fields) {
+				if(err) {
+					console.log("error looking up professor after creating");
+					console.log(err);
+				}
+				else {
+					res.status(200).json({
+						id: rows[0].professorId	
+					});
+				}
+			});
 		}
 	});
 });
@@ -144,6 +156,7 @@ app.post('createschool', function(req, res, next) {
 	var data = [req.body.name, req.body.pic, req.body.world];
 
 	var createSchoolQuery = "INSERT INTO Schools (schoolName, pictureURL, worldId) VALUES ( ? , ? , ? )";
+	var getSchoolQuery = "SELECT schoolId FROM Schools WHERE schoolName = ?";
 
 	mysql.pool.query(createSchoolQuery, data, function(err, rows, fields) {
 		if(err) {
@@ -152,7 +165,17 @@ app.post('createschool', function(req, res, next) {
 			res.status(500).end();
 		}
 		else {
-			res.status(200).end();
+			mysql.pool.query(getSchoolQuery, req.body.name, function(err, rows, fields) {
+				if(err) {
+					console.log("error looking up school after creating");
+					console.log(err);
+				}
+				else {
+					res.status(200).json({
+						id: rows[0].schoolId
+					});
+				}
+			});
 		}
 	});
 });
