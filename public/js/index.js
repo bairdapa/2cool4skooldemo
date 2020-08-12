@@ -239,7 +239,7 @@ $(document).ready(function() {
 
 	});
 
-	$("#create_prof_submit").click() {
+	$("#create_prof_submit").click(function() {
 		var data = {
 			fname: $(this).parent().find("#create_prof_fname").val(),
 			lname: $(this).parent().find("#create_prof_lname").val(),
@@ -261,7 +261,7 @@ $(document).ready(function() {
 		});
 	});
 
-	$("#create_school_submit").click() {
+	$("#create_school_submit").click(function() {
 		var data = {
 			name: $(this).parent().find("#create_school_name").val(),
 			pic: $(this).parent().find("#create_school_pic").val(),

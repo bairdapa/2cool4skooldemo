@@ -104,7 +104,7 @@ app.get('/createprofessor', function(req, res, next) {
 });
 
 // create professor action
-app.post('createprofessor', function(req, res, next) {
+app.post('/createprofessor', function(req, res, next) {
 	var data1 = [req.body.fname, req.body.lname, req.body.pic, req.body.school, req.body.world];
 	var data2 = [req.body.fname, req.body.lname]
 
@@ -152,7 +152,7 @@ app.get('/createschool', function(req, res, next) {
 });
 
 // create schools action
-app.post('createschool', function(req, res, next) {
+app.post('/createschool', function(req, res, next) {
 	var data = [req.body.name, req.body.pic, req.body.world];
 
 	var createSchoolQuery = "INSERT INTO Schools (schoolName, pictureURL, worldId) VALUES ( ? , ? , ? )";
@@ -797,7 +797,6 @@ app.get('/user',function(req, res, next) {
 
 // catch errors (404 and 500)
 app.use(function(req,res){
-	console.log(req);
 	res.status(404);
 	res.render('404');
 });
