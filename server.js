@@ -121,6 +121,41 @@ app.get('/createaccount',function(req, res, next) {
 	res.render('createaccount');
 });
 
+// create account action
+app.post('/createaccount', function(req, res, next) {
+	data = [req.body.fname, req.body.lname, req.body.bio, req.body.pic];
+
+	var createAccQuery = "INSERT INTO Users (fName, lName, biography, pictureURL, worldId) VALUES ( ? , ? , ? , ?, 6)";
+
+	responseJSON = {
+		success = false,
+		user: req.body.fname + " " + req.body.lname,
+		id: -1,
+		session_key: null
+	};
+
+	mysql.pool.query(createAccQuery, data, function(err, rows, fields) {
+		if(err) {
+			console.log("sql error while creating account");
+			console.log(err);
+			res.status(500).json(responseJSON);
+		}
+		else {
+			var new_key = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+			var new_session_val = {
+				expiry: Date.now() + (1000*60*60),
+				id: rows[0].userId
+			};
+
+			sessions[new_key] = new_session_val;
+			responseJSON.success = true;
+			responseJSON.session_key = new_key;
+			responseJSON.id = rows[0].userId;
+			res.status(200).json(responseJSON);
+		}
+	});
+});
+
 // create review
 app.get('/createreview',function(req, res, next) {
 	res.status(200);
