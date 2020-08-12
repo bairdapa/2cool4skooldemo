@@ -196,7 +196,7 @@ app.post('/createaccount', function(req, res, next) {
 app.get('/browseprofessors', function(req, res, next) {
 	var getProfessorsQuery = "SELECT * FROM Professors WHERE 1";
 	
-	mysql.pool.qeury(getProfessorsQuery, function(err, rows, fields) {
+	mysql.pool.query(getProfessorsQuery, function(err, rows, fields) {
 		if(err) {
 			console.log("error fetching professor list");
 			console.log(err);
@@ -211,9 +211,9 @@ app.get('/browseprofessors', function(req, res, next) {
 });
 
 app.get('/browseschools', function(req, res, next) {
-	var getProfessorsQuery = "SELECT * Schools FROM WHERE 1";
+	var getSchoolsQuery = "SELECT * Schools FROM WHERE 1";
 	
-	mysql.pool.qeury(getProfessorsQuery, function(err, rows, fields) {
+	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
 		if(err) {
 			console.log("error fetching school list");
 			console.log(err);
