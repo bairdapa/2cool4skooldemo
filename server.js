@@ -121,6 +121,120 @@ app.get('/createaccount',function(req, res, next) {
 	res.render('createaccount');
 });
 
+// create account action
+app.post('/createaccount', function(req, res, next) {
+	data1 = [req.body.fname, req.body.lname, req.body.bio, req.body.pic];
+	data2 = [req.body.fname, req.body.lname];
+
+	var createAccQuery = "INSERT INTO Users (fName, lName, biography, pictureURL, worldId) VALUES ( ? , ? , ? , ?, 6)";
+	var getUserQuery = "SELECT userID FROM Users WHERE fName = ? AND lName = ?";
+
+	responseJSON = {
+		success: false,
+		user: req.body.fname + " " + req.body.lname,
+		id: -1,
+		session_key: null
+	};
+
+	mysql.pool.getConnection(function(err, connection) {
+		connection.beginTransaction(function(err) {
+			if(err) { //transaction error
+				connection.rollback(function() {
+					connection.release();
+					console.log("error init transaction:\n" + err);
+				});
+			}
+			else {
+				connection.query(createAccQuery, data1, function(err, results) {
+					if(err) { //transaction error
+						connection.rollback(function() {
+							connection.release();
+							console.log("error q1 of transaction:\n" + err + "\n" + data1);
+						});
+					}
+					else {
+						connection.query(getUserQuery, data2, function(err, results) {
+							if(err) { //transaction error
+								connection.rollback(function() {
+									connection.release();
+									console.log("error q2 of transaction:\n" + err + "\n" + data2);
+								});
+							}
+							else {
+								connection.commit(function(err) {
+									if(err) { //transaction error
+										connection.rollback(function() {
+											connection.release();
+											console.log("error commit transaction:\n" + err);
+										});
+									}
+									else {
+										var new_key = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+										var new_session_val = {
+											expiry: Date.now() + (1000*60*60),
+											id: results[0].userId
+										};
+
+										sessions[new_key] = new_session_val;
+										responseJSON.success = true;
+										responseJSON.session_key = new_key;
+										responseJSON.id = results[0].userId;
+										res.status(200).json(responseJSON);
+
+										connection.release();
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+	});
+});
+
+app.get('/browseprofessors', function(req, res, next) {
+	var getProfessorsQuery = "SELECT Professors.professorId, Professors.schoolId, Professors.worldId, Professors.fName, Professors.lName, Professors.pictureURL, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Worlds ON Worlds.worldId = Professors.WorldId INNER JOIN Schools ON Schools.schoolId = Professors.schoolId WHERE 1";
+	
+	mysql.pool.query(getProfessorsQuery, function(err, rows, fields) {
+		if(err) {
+			console.log("error fetching professor list");
+			console.log(err);
+		}
+		else
+		{
+			for(var i = 0; i < rows.length; i++)
+			{
+				rows[i].link = 'href=professorreviews?id=' + rows[i].professorId;
+			}
+			res.status(200).render('browseprofessors', {
+				results: rows
+			});
+		}
+	});
+});
+
+app.get('/browseschools', function(req, res, next) {
+	var getSchoolsQuery = "SELECT * FROM Schools INNER JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE 1";
+	
+	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
+		if(err) {
+			console.log("error fetching school list");
+			console.log(err);
+		}
+		else
+		{
+			for(var i = 0; i < rows.length; i++)
+			{
+				rows[i].link = 'href=schoolreviews?id=' + rows[i].schoolId;
+			}
+			res.status(200).render('browseschools', {
+				results: rows
+			});
+		}
+	});
+});
+
 // create review
 app.get('/createreview',function(req, res, next) {
 	res.status(200);
@@ -355,7 +469,7 @@ app.get('/schoolreviews',function(req, res, next) {
 						rows[i].rating = convert_rating(rows[i].rating);
 						rows[i].link = "user?id=" + rows[i].userId;
 					}
-					sdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
+					sdata.avgRating = 'Average Rating: ' + convert_rating(Math.ceil(rating_counter / rows.length));
 
 					res.status(200);
 					res.render('schoolreviews', {
@@ -415,7 +529,7 @@ app.get('/professorreviews',function(req, res, next) {
 						rows[i].rating = convert_rating(rows[i].rating);
 						rows[i].link = "user?id=" + rows[i].userId;
 					}
-					pdata.avgRating = convert_rating(Math.ceil(rating_counter / rows.length));
+					pdata.avgRating = 'Average Rating: ' + convert_rating(Math.ceil(rating_counter / rows.length));
 
 					res.status(200);
 					res.render('professorreviews', {
@@ -572,6 +686,7 @@ app.get('/user',function(req, res, next) {
 
 // catch errors (404 and 500)
 app.use(function(req,res){
+	console.log(req);
 	res.status(404);
 	res.render('404');
 });

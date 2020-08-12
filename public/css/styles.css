@@ -158,6 +158,19 @@ div.reviews_page_tiles {
 	border-color: black;
 }
 
+div.browse_page_tiles{
+	position: absolute;
+	top: 250px;
+	left: calc(50% - 400px);
+	width: 801px;
+	height: 650px;
+	overflow:hidden;
+	overflow-y: auto;
+	border-style: solid;
+	border-width: 2px 0px 2px 0px;
+	border-color: black;
+}
+
 div.home_link {
 	position: absolute;
 	left: 25px;
@@ -234,7 +247,7 @@ a.review_rating {
 div.professortile_container, div.schooltile_container {
 	position: relative;
 	width: 100%;
-	height: 100%;
+	height: 200px;
 	padding: 8px;
 	box-sizing: border-box;
 	border-style: solid;
@@ -244,6 +257,7 @@ div.professortile_container, div.schooltile_container {
 
 div.professortile_image, div.schooltile_image {
 	float: left;
+	padding-right: 10px;
 	width: 180px;
 	height: 100%;
 }
@@ -254,7 +268,6 @@ img.professortile_image, img.schooltile_image {
 }
 
 div.professortile_title, div.schooltile_title {
-	float: left;
 	width: 600px;
 	height: 50px;
 	padding: 10px;
@@ -262,7 +275,6 @@ div.professortile_title, div.schooltile_title {
 }
 
 div.professortile_body, div.schooltile_body {
-	float: left;
 	width: 600px;
 	height: 130px;
 	padding: 10px;
