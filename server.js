@@ -103,8 +103,24 @@ app.get('/createprofessor', function(req, res, next) {
 	});
 });
 
-
 // create school page
+app.get('/createschool', function(req, res, next) {
+	var getWorldsQuery = "SELECT Worlds.worldId, Worlds.worldName FROM Worlds WHERE 1";
+
+	mysql.pool.query(getWorldsQuery, function(err, rows, fields) {
+		if(err) {
+			console.log("sql error while getting list of worlds");
+			console.log(err);
+			res.status(500).end();
+		}
+		else {
+			res.status(200).render('createschool', {
+				worlds: rows
+			});
+		}
+	});
+});
+
 
 // login request
 app.get('/loginrequest', function(req, res, next) {
