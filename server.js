@@ -108,7 +108,7 @@ app.post('/createprofessor', function(req, res, next) {
 	var data1 = [req.body.fname, req.body.lname, req.body.pic, req.body.school, req.body.world];
 	var data2 = [req.body.fname, req.body.lname]
 
-	var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId, worldId) VALUES ( ? , ? , ? , ? , ? )";
+		var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId, worldId) VALUES ( ? , ? , ? , ? , ? )";
 	var getProfQuery = "SELECT professorId FROM Professors WHERE fName = ? AND lName = ?";
 
 	if(req.body.world == "new") {
@@ -490,15 +490,12 @@ app.post('/createreview', function(req, res, next) {
 
 	var userId = sessions[req.body.session_key].id;
 
-	var data1 = [parseInt(req.body.review_rating), req.body.justification, userId, parseInt(req.body.target_id)];
-	var data2 = [userId, parseInt(req.body.target_id)];
+	var data = [parseInt(req.body.review_rating), req.body.justification, userId, parseInt(req.body.target_id)];
 	if(req.body.review_type == "prof") {
 		createReviewQueryString = "INSERT INTO Reviews (rating, justification, userId, schoolId, professorId) VALUES ( ? , ? , ? , NULL, ? )";
-		createIntersectionQueryString = "INSERT INTO UserProfessorIntersections (reviewId, userId, professorId) VALUES ((SELECT reviewId FROM Reviews WHERE reviewId = @@Identity), ? , ? )";
 	}
 	else {
 		createReviewQueryString = "INSERT INTO Reviews (rating, justification, userId, schoolId, professorId) VALUES ( ? , ? , ? , ? , NULL);";
-		createIntersectionQueryString = "INSERT INTO UserSchoolIntersections (reviewId, userId, schoolId) VALUES ((SELECT reviewId FROM Reviews WHERE reviewId = @@Identity), ? , ? );";
 	}
 
 	mysql.pool.getConnection(function(err, connection) {
@@ -510,7 +507,7 @@ app.post('/createreview', function(req, res, next) {
 				});
 			}
 			else {
-				connection.query(createReviewQueryString, data1, function(err, results) {
+				connection.query(createReviewQueryString, data, function(err, results) {
 					if(err) { //transaction error
 						connection.rollback(function() {
 							connection.release();
@@ -518,25 +515,15 @@ app.post('/createreview', function(req, res, next) {
 						});
 					}
 					else {
-						connection.query(createIntersectionQueryString, data2, function(err, results) {
+						connection.commit(function(err) {
 							if(err) { //transaction error
 								connection.rollback(function() {
 									connection.release();
-									console.log("error q2 of transaction:\n" + err + "\n" + data2);
+									console.log("error commit transaction:\n" + err);
 								});
 							}
 							else {
-								connection.commit(function(err) {
-									if(err) { //transaction error
-										connection.rollback(function() {
-											connection.release();
-											console.log("error commit transaction:\n" + err);
-										});
-									}
-									else {
-										connection.release();
-									}
-								});
+								connection.release();
 							}
 						});
 					}
@@ -745,73 +732,42 @@ app.get('/professorreviews',function(req, res, next) {
 // delete review
 app.get('/deletereview', function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
-	var reviewTypeQueryString = "SELECT Reviews.professorId FROM Reviews WHERE Reviews.reviewId = ?";
-	var deleteQueryString1;
-	var deleteQueryString2 = "DELETE FROM Reviews WHERE Reviews.reviewId = ?";
+	var deleteQueryString = "DELETE FROM Reviews WHERE Reviews.reviewId = ?";
 
 	if(check_session_key(url_params.session_key)) {
-		mysql.pool.query(reviewTypeQueryString, url_params.id, function(err, rows, fields) {
-			if(err) {
-				console.log("sql error detecting review type for deletion");
-				console.log(err);
-			}
-			else
-			{
-				if(rows[0].professorId != null) {
-					// prof review
-					deleteQueryString1 = "DELETE FROM UserProfessorIntersections WHERE reviewId = ?"
+		mysql.pool.getConnection(function(err, connection) {
+			connection.beginTransaction(function(err) {
+				if(err) { //transaction error
+					connection.rollback(function() {
+						connection.release();
+						console.log("error init transaction:\n" + err);
+					});
 				}
 				else {
-					// school review
-					deleteQueryString1 = "DELETE FROM UserSchoolIntersections WHERE reviewId = ?"
-				}
-
-
-				mysql.pool.getConnection(function(err, connection) {
-					connection.beginTransaction(function(err) {
+					connection.query(deleteQueryString, url_params.id, function(err, results) {
 						if(err) { //transaction error
 							connection.rollback(function() {
 								connection.release();
-								console.log("error init transaction:\n" + err);
+								console.log("error q2 of transaction:\n" + err);
 							});
 						}
 						else {
-							connection.query(deleteQueryString1, url_params.id, function(err, results) {
+							connection.commit(function(err) {
 								if(err) { //transaction error
 									connection.rollback(function() {
 										connection.release();
-										console.log("error q1 of transaction:\n" + err);
+										console.log("error commit transaction:\n" + err);
 									});
 								}
 								else {
-									connection.query(deleteQueryString2, url_params.id, function(err, results) {
-										if(err) { //transaction error
-											connection.rollback(function() {
-												connection.release();
-												console.log("error q2 of transaction:\n" + err);
-											});
-										}
-										else {
-											connection.commit(function(err) {
-												if(err) { //transaction error
-													connection.rollback(function() {
-														connection.release();
-														console.log("error commit transaction:\n" + err);
-													});
-												}
-												else {
-													connection.release();
-													res.status(200).end();
-												}
-											});
-										}
-									});
+									connection.release();
+									res.status(200).end();
 								}
 							});
 						}
 					});
-				});
-			}
+				}
+			});
 		});
 	}
 	else {
