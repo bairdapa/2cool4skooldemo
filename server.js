@@ -154,6 +154,9 @@ app.post('/createprofessor', function(req, res, next) {
 		});
 	}
 	else {
+		if(req.body.world == "null") {
+			var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId) VALUES ( ? , ? , ? , ? )";
+		}
 		mysql.pool.query(createProfQuery, data1, function(err, rows, fields) {
 			if(err) {
 				console.log("error creating professor");
@@ -246,6 +249,9 @@ app.post('/createschool', function(req, res, next) {
 		});
 	}
 	else {
+		if(req.body.world == "null") {
+			var createSchoolQuery = "INSERT INTO Schools (schoolName, pictureURL) VALUES ( ? , ? )";
+		}
 		mysql.pool.query(createSchoolQuery, data, function(err, rows, fields) {
 			if(err) {
 				console.log("error creating school");
@@ -393,7 +399,7 @@ app.post('/createaccount', function(req, res, next) {
 
 // browse professors
 app.get('/browseprofessors', function(req, res, next) {
-	var getProfessorsQuery = "SELECT Professors.professorId, Professors.schoolId, Professors.worldId, Professors.fName, Professors.lName, Professors.pictureURL, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Worlds ON Worlds.worldId = Professors.WorldId INNER JOIN Schools ON Schools.schoolId = Professors.schoolId WHERE 1";
+	var getProfessorsQuery = "SELECT Professors.professorId, Professors.schoolId, Professors.worldId, Professors.fName, Professors.lName, Professors.pictureURL, Schools.schoolName, Worlds.worldName FROM Professors LEFT JOIN Worlds ON Worlds.worldId = Professors.WorldId INNER JOIN Schools ON Schools.schoolId = Professors.schoolId WHERE 1";
 
 	mysql.pool.query(getProfessorsQuery, function(err, rows, fields) {
 		if(err) {
@@ -405,6 +411,9 @@ app.get('/browseprofessors', function(req, res, next) {
 			for(var i = 0; i < rows.length; i++)
 			{
 				rows[i].link = 'href=professorreviews?id=' + rows[i].professorId;
+				if(rows[i].worldName != null) {
+					rows[i].worldName = "World: " + rows[i].worldName;
+				}
 			}
 			res.status(200).render('browseprofessors', {
 				results: rows
@@ -415,7 +424,7 @@ app.get('/browseprofessors', function(req, res, next) {
 
 // browse schools
 app.get('/browseschools', function(req, res, next) {
-	var getSchoolsQuery = "SELECT * FROM Schools INNER JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE 1";
+	var getSchoolsQuery = "SELECT * FROM Schools LEFT JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE 1";
 
 	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
 		if(err) {
@@ -427,6 +436,9 @@ app.get('/browseschools', function(req, res, next) {
 			for(var i = 0; i < rows.length; i++)
 			{
 				rows[i].link = 'href=schoolreviews?id=' + rows[i].schoolId;
+				if(rows[i].worldName != null) {
+					rows[i].worldName = "World: " + rows[i].worldName;
+				}
 			}
 			res.status(200).render('browseschools', {
 				results: rows
@@ -614,7 +626,7 @@ app.get('/schoolreviews',function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
 
 	var reviewQueryString = "SELECT * FROM Reviews INNER JOIN Schools ON Schools.schoolId = Reviews.schoolId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.schoolId = ?";
-	var schoolQueryString = "SELECT * FROM Schools INNER JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE Schools.schoolId = ?";
+	var schoolQueryString = "SELECT * FROM Schools LEFT JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE Schools.schoolId = ?";
 
 	var sdata = {};
 
@@ -638,6 +650,9 @@ app.get('/schoolreviews',function(req, res, next) {
 		}
 		else
 		{
+			if(rows[0].worldName != null) {
+				rows[0].worldName = "World: " + rows[0].worldName;
+			}
 			sdata = rows[0];
 
 			mysql.pool.query(reviewQueryString, url_params.id, function(err, rows, fields) {
@@ -674,7 +689,7 @@ app.get('/professorreviews',function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
 
 	var reviewQueryString = "SELECT * FROM Reviews INNER JOIN Professors ON Professors.professorId = Reviews.professorId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.professorId = ?";
-	var profQueryString = "SELECT Professors.pictureURL, Professors.fName, Professors.lName, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Schools ON Schools.schoolId = Professors.schoolId INNER JOIN Worlds ON Worlds.worldId = Professors.worldId WHERE Professors.professorId = ?";
+	var profQueryString = "SELECT Professors.pictureURL, Professors.fName, Professors.lName, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Schools ON Schools.schoolId = Professors.schoolId LEFT JOIN Worlds ON Worlds.worldId = Professors.worldId WHERE Professors.professorId = ?";
 
 	var pdata = {};
 
@@ -698,6 +713,9 @@ app.get('/professorreviews',function(req, res, next) {
 		}
 		else
 		{
+			if(rows[0].worldName != null) {
+				rows[0].worldName = "World: " + rows[0].worldName;
+			}
 			pdata = rows[0];
 
 			mysql.pool.query(reviewQueryString, url_params.id, function(err, rows, fields) {
