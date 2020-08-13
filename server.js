@@ -111,26 +111,70 @@ app.post('/createprofessor', function(req, res, next) {
 	var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId, worldId) VALUES ( ? , ? , ? , ? , ? )";
 	var getProfQuery = "SELECT professorId FROM Professors WHERE fName = ? AND lName = ?";
 
-	mysql.pool.query(createProfQuery, data1, function(err, rows, fields) {
-		if(err) {
-			console.log("error creating professor");
-			console.log(err);
-			res.status(500).end();
-		}
-		else {
-			mysql.pool.query(getProfQuery, data2, function(err, rows, fields) {
-				if(err) {
-					console.log("error looking up professor after creating");
-					console.log(err);
-				}
-				else {
-					res.status(200).json({
-						id: rows[0].professorId	
-					});
-				}
-			});
-		}
-	});
+	if(req.body.world == "new") {
+		var createWorldQuery = "INSERT INTO Worlds (worldName) VALUES ( ? )";
+		var getWorldQuery = "SELECT worldId FROM Worlds WHERE worldName= ?";
+
+		mysql.pool.query(createWorldQuery, req.body.new_world, function(err, rows, fields) {
+			if(err) {
+				console.log("error creating world");
+				console.log(err);
+			}
+			else {
+				mysql.pool.query(getWorldQuery, req.body.new_world, function(err, rows, fields) {
+					if(err) {
+						console.log("error getting world");
+						console.log(err);
+					}
+					else {
+						data1[4] = rows[0].worldId;
+						mysql.pool.query(createProfQuery, data1, function(err, rows, fields) {
+							if(err) {
+								console.log("error creating professor");
+								console.log(err);
+								res.status(500).end();
+							}
+							else {
+								mysql.pool.query(getProfQuery, data2, function(err, rows, fields) {
+									if(err) {
+										console.log("error looking up professor after creating");
+										console.log(err);
+									}
+									else {
+										res.status(200).json({
+											id: rows[0].professorId	
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+	}
+	else {
+		mysql.pool.query(createProfQuery, data1, function(err, rows, fields) {
+			if(err) {
+				console.log("error creating professor");
+				console.log(err);
+				res.status(500).end();
+			}
+			else {
+				mysql.pool.query(getProfQuery, data2, function(err, rows, fields) {
+					if(err) {
+						console.log("error looking up professor after creating");
+						console.log(err);
+					}
+					else {
+						res.status(200).json({
+							id: rows[0].professorId	
+						});
+					}
+				});
+			}
+		});
+	}
 });
 
 // create school page
@@ -158,26 +202,71 @@ app.post('/createschool', function(req, res, next) {
 	var createSchoolQuery = "INSERT INTO Schools (schoolName, pictureURL, worldId) VALUES ( ? , ? , ? )";
 	var getSchoolQuery = "SELECT schoolId FROM Schools WHERE schoolName = ?";
 
-	mysql.pool.query(createSchoolQuery, data, function(err, rows, fields) {
-		if(err) {
-			console.log("error creating school");
-			console.log(err);
-			res.status(500).end();
-		}
-		else {
-			mysql.pool.query(getSchoolQuery, req.body.name, function(err, rows, fields) {
-				if(err) {
-					console.log("error looking up school after creating");
-					console.log(err);
-				}
-				else {
-					res.status(200).json({
-						id: rows[0].schoolId
-					});
-				}
-			});
-		}
-	});
+	if(req.body.world == "new") {
+		var createWorldQuery = "INSERT INTO Worlds (worldName) VALUES ( ? )";
+		var getWorldQuery = "SELECT worldId FROM Worlds WHERE worldName= ?";
+
+		mysql.pool.query(createWorldQuery, req.body.new_world, function(err, rows, fields) {
+			if(err) {
+				console.log("error creating world");
+				console.log(err);
+			}
+			else {
+				mysql.pool.query(getWorldQuery, req.body.new_world, function(err, rows, fields) {
+					if(err) {
+						console.log("error getting world");
+						console.log(err);
+					}
+					else {
+						data[2] = rows[0].worldId;
+
+						mysql.pool.query(createSchoolQuery, data, function(err, rows, fields) {
+							if(err) {
+								console.log("error creating school");
+								console.log(err);
+								res.status(500).end();
+							}
+							else {
+								mysql.pool.query(getSchoolQuery, req.body.name, function(err, rows, fields) {
+									if(err) {
+										console.log("error looking up school after creating");
+										console.log(err);
+									}
+									else {
+										res.status(200).json({
+											id: rows[0].schoolId
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+	}
+	else {
+		mysql.pool.query(createSchoolQuery, data, function(err, rows, fields) {
+			if(err) {
+				console.log("error creating school");
+				console.log(err);
+				res.status(500).end();
+			}
+			else {
+				mysql.pool.query(getSchoolQuery, req.body.name, function(err, rows, fields) {
+					if(err) {
+						console.log("error looking up school after creating");
+						console.log(err);
+					}
+					else {
+						res.status(200).json({
+							id: rows[0].schoolId
+						});
+					}
+				});
+			}
+		});
+	}
 });
 
 

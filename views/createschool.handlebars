@@ -12,7 +12,10 @@
 			{{#each worlds}}
 				<option value="{{worldId}}">{{worldName}}</option>
 			{{/each}}
-		</select><br><br>
+			<option value="new">- Create New World -</option>
+		</select>
+		<input id="newworldtext" type="text" placeholder="new world" style="display:none;">
+		<br><br>
 
 		<a class="normal_text">Picture URL</a>
 		<input type="text" id="create_school_pic"><br><br>

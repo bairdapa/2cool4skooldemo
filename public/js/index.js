@@ -245,7 +245,8 @@ $(document).ready(function() {
 			lname: $(this).parent().find("#create_prof_lname").val(),
 			pic: $(this).parent().find("#create_prof_pic").val(),
 			school: $(this).parent().find("#create_prof_school").val(),
-			world: $(this).parent().find("#create_prof_world").val()
+			world: $(this).parent().find("#create_prof_world").val(),
+			new_world: $(this).parent().find("#newworldtext").val()
 		};	
 
 		$.post("createprofessor", data, function(data, status) {
@@ -261,11 +262,21 @@ $(document).ready(function() {
 		});
 	});
 
+	$("#create_prof_world").change(function() {
+		if($(this).val() == "new") {
+			$(this).parent().find("#newworldtext").css("display", "inline");
+		}
+		else {
+			$(this).parent().find("#newworldtext").css("display", "none");
+		}
+	});
+
 	$("#create_school_submit").click(function() {
 		var data = {
 			name: $(this).parent().find("#create_school_name").val(),
 			pic: $(this).parent().find("#create_school_pic").val(),
-			world: $(this).parent().find("#create_school_world").val()
+			world: $(this).parent().find("#create_school_world").val(),
+			new_world: $(this).parent().find("#newworldtext").val()
 		};	
 
 		$.post("createschool", data, function(data, status) {
@@ -280,6 +291,16 @@ $(document).ready(function() {
 		
 		});
 	});
+
+	$("#create_school_world").change(function() {
+		if($(this).val() == "new") {
+			$(this).parent().find("#newworldtext").css("display", "inline");
+		}
+		else {
+			$(this).parent().find("#newworldtext").css("display", "none");
+		}
+	});
+
 
 	$(".modify_review_button").each(function() {
 		var tile = $(this).parent().parent();
