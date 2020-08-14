@@ -1,19 +1,7 @@
+// stores the rating of the review currently begin edited/created
 var create_review_rating = 0;
 
-function fillSearch(id) {
-	vars = getUrlVars();
-	document.getElementById(id).value = vars[id];
-}
-
-
-function getUrlVars() {
-	var vars = {};
-	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-		vars[key] = value;
-	});
-	return vars;
-}
-
+// calls the ajax post request to the create review route
 function create_review(type, id, rating, just)
 {
 	var data = {
@@ -35,7 +23,10 @@ function create_review(type, id, rating, just)
 	});
 }
 
+// adds event listeners
 $(document).ready(function() {
+
+	// check to see if user is logged in, if yes update interface
 	if(sessionStorage.getItem("session_key") != null) {
 		$("#logincreate").css("display", "none");
 		$("#logged_in_user").text(sessionStorage.getItem("user"));
@@ -44,24 +35,40 @@ $(document).ready(function() {
 		$("#home_create_review").attr("href", "createreview");
 	}
 
+	// show/hide dropdowns based on type of review being created
+	$("#radio_school").click(function(){
+		$(this).parent().find("#create_review_school_name").css("display", "block");
+		$(this).parent().find("#create_review_prof_name").css("display", "none");
+	});
+
+	// show/hide dropdowns based on type of review being created
+	$("#radio_prof").click(function(){
+		$(this).parent().find("#create_review_school_name").css("display", "none");
+		$(this).parent().find("#create_review_prof_name").css("display", "block");
+	});
+
+	// submit search on enter button pressed
 	$("#prof_search_textbox").keypress(function(e) {
 		if(e.keyCode == 13) {
 			$("#prof_search_button").click();
 		}
 	});
 	
+	// submit search on enter button pressed
 	$("#school_search_textbox").keypress(function(e) {
 		if(e.keyCode == 13) {
 			$("#school_search_button").click();
 		}
 	});
 
+	// submit login on enter button pressed
 	$("#login_lname").keypress(function(e) {
 		if(e.keyCode == 13) {
 			$("#submit_login").click();
 		}
 	});
 
+	// search professors on prof search button clicked
 	$("#prof_search_button").click(function() {
 		var full_name = document.getElementById("prof_search_textbox").value;
 		var name_arr = full_name.split(" ");
@@ -82,6 +89,7 @@ $(document).ready(function() {
 		});
 	});
 
+	// search schools on school search button clicked
 	$("#school_search_button").click(function() {
 		var name = document.getElementById("school_search_textbox").value;
 
@@ -101,6 +109,7 @@ $(document).ready(function() {
 		});
 	});
 
+	// updates star button icons and internal rating counter when clicked
 	$(".create_review_star_button").each(function() {
 		var i;
 		for(var ind = 1; ind <= 5; ind++) {
@@ -130,9 +139,9 @@ $(document).ready(function() {
 		});
 	});
 
+	// submits a review async when submit button clicked
 	$("#submit_review").click(function() {
 		var review_type;
-		var review_target_id = -1;
 		var $selected = $('input[name="review_type"]:checked');
 		if($selected.legnth == 0) {
 			alert("please select either professor or school for your review type");
@@ -144,48 +153,15 @@ $(document).ready(function() {
 
 		if(review_type == "prof")
 		{
-			var full_name = $("#create_review_textbox").val();
-			var name_arr = full_name.split(" ");
-
-			$.get("searchprofessors?fname=" + name_arr[0] + "&lname=" + name_arr[1], function(data, status) {
-				if(status == "success") {
-					if(data.found) {
-						review_target_id = data.id;
-						create_review(review_type, review_target_id, create_review_rating, $("#create_review_justification").val());
-					}
-					else
-					{
-						alert("the professor you tried to create a review for is not in the database");
-					}
-				}
-				else {
-					alert("create review request caused an error on the server!");
-				}
-			});
+			create_review(review_type, $("#create_review_prof_name").val(), create_review_rating, $("#create_review_justification").val());
 		}
 		else
 		{
-			var name = $("#create_review_textbox").val();
-
-			$.get("searchschools?schoolname=" + name, function(data, status) {
-				if(status == "success") {
-					if(data.found) {
-						review_target_id = data.id;
-						create_review(review_type, review_target_id, create_review_rating, $("#create_review_justification").val());
-					}
-					else
-					{
-						alert("the school you tried to create a review for is not in the database");
-					}
-				}
-				else {
-					alert("create review request caused an error on the server!");
-				}
-			});
+			create_review(review_type, $("#create_review_school_name").val(), create_review_rating, $("#create_review_justification").val());
 		}
 	});
 
-
+	// submits a login request when login button clicked
 	$("#submit_login").click(function() {
 		var fname = $("#login_fname").val();
 		var lname = $("#login_lname").val();
@@ -210,6 +186,7 @@ $(document).ready(function() {
 		});
 	});
 
+	// clears session vars when logout clicked
 	$("#logout_button").click(function() {
 		sessionStorage.removeItem("session_key");
 		sessionStorage.removeItem("user");
@@ -217,6 +194,7 @@ $(document).ready(function() {
 		window.location.href = "/";
 	});
 
+	// sends create account post request when create account button clicked
 	$("#createaccountbutton").click(function() {
 		var data = {
 			fname: $(this).parent().find("#createaccfname").val(),
@@ -239,13 +217,15 @@ $(document).ready(function() {
 
 	});
 
+	// sends create prof post request when create prof button clicked
 	$("#create_prof_submit").click(function() {
 		var data = {
 			fname: $(this).parent().find("#create_prof_fname").val(),
 			lname: $(this).parent().find("#create_prof_lname").val(),
 			pic: $(this).parent().find("#create_prof_pic").val(),
 			school: $(this).parent().find("#create_prof_school").val(),
-			world: $(this).parent().find("#create_prof_world").val()
+			world: $(this).parent().find("#create_prof_world").val(),
+			new_world: $(this).parent().find("#newworldtext").val()
 		};	
 
 		$.post("createprofessor", data, function(data, status) {
@@ -261,11 +241,23 @@ $(document).ready(function() {
 		});
 	});
 
+	// shows/hides the new world text box on create prof page
+	$("#create_prof_world").change(function() {
+		if($(this).val() == "new") {
+			$(this).parent().find("#newworldtext").css("display", "inline");
+		}
+		else {
+			$(this).parent().find("#newworldtext").css("display", "none");
+		}
+	});
+
+	// sends create prof post request when create prof button clicked
 	$("#create_school_submit").click(function() {
 		var data = {
 			name: $(this).parent().find("#create_school_name").val(),
 			pic: $(this).parent().find("#create_school_pic").val(),
-			world: $(this).parent().find("#create_school_world").val()
+			world: $(this).parent().find("#create_school_world").val(),
+			new_world: $(this).parent().find("#newworldtext").val()
 		};	
 
 		$.post("createschool", data, function(data, status) {
@@ -281,6 +273,17 @@ $(document).ready(function() {
 		});
 	});
 
+	// shows/hides the new world text box on create school page
+	$("#create_school_world").change(function() {
+		if($(this).val() == "new") {
+			$(this).parent().find("#newworldtext").css("display", "inline");
+		}
+		else {
+			$(this).parent().find("#newworldtext").css("display", "none");
+		}
+	});
+
+	// shows the modify review interface when modify review button clicked
 	$(".modify_review_button").each(function() {
 		var tile = $(this).parent().parent();
 		var name = tile.find(".review_header").find(".review_name").text();

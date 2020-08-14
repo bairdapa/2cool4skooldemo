@@ -106,31 +106,78 @@ app.get('/createprofessor', function(req, res, next) {
 // create professor action
 app.post('/createprofessor', function(req, res, next) {
 	var data1 = [req.body.fname, req.body.lname, req.body.pic, req.body.school, req.body.world];
-	var data2 = [req.body.fname, req.body.lname]
+	var data2 = [req.body.fname, req.body.lname];
 
 	var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId, worldId) VALUES ( ? , ? , ? , ? , ? )";
 	var getProfQuery = "SELECT professorId FROM Professors WHERE fName = ? AND lName = ?";
 
-	mysql.pool.query(createProfQuery, data1, function(err, rows, fields) {
-		if(err) {
-			console.log("error creating professor");
-			console.log(err);
-			res.status(500).end();
+	if(req.body.world == "new") {
+		var createWorldQuery = "INSERT INTO Worlds (worldName) VALUES ( ? )";
+		var getWorldQuery = "SELECT worldId FROM Worlds WHERE worldName= ?";
+
+		mysql.pool.query(createWorldQuery, req.body.new_world, function(err, rows, fields) {
+			if(err) {
+				console.log("error creating world");
+				console.log(err);
+			}
+			else {
+				mysql.pool.query(getWorldQuery, req.body.new_world, function(err, rows, fields) {
+					if(err) {
+						console.log("error getting world");
+						console.log(err);
+					}
+					else {
+						data1[4] = rows[0].worldId;
+						mysql.pool.query(createProfQuery, data1, function(err, rows, fields) {
+							if(err) {
+								console.log("error creating professor");
+								console.log(err);
+								res.status(500).end();
+							}
+							else {
+								mysql.pool.query(getProfQuery, data2, function(err, rows, fields) {
+									if(err) {
+										console.log("error looking up professor after creating");
+										console.log(err);
+									}
+									else {
+										res.status(200).json({
+											id: rows[0].professorId	
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+	}
+	else {
+		if(req.body.world == "null") {
+			var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId) VALUES ( ? , ? , ? , ? )";
 		}
-		else {
-			mysql.pool.query(getProfQuery, data2, function(err, rows, fields) {
-				if(err) {
-					console.log("error looking up professor after creating");
-					console.log(err);
-				}
-				else {
-					res.status(200).json({
-						id: rows[0].professorId	
-					});
-				}
-			});
-		}
-	});
+		mysql.pool.query(createProfQuery, data1, function(err, rows, fields) {
+			if(err) {
+				console.log("error creating professor");
+				console.log(err);
+				res.status(500).end();
+			}
+			else {
+				mysql.pool.query(getProfQuery, data2, function(err, rows, fields) {
+					if(err) {
+						console.log("error looking up professor after creating");
+						console.log(err);
+					}
+					else {
+						res.status(200).json({
+							id: rows[0].professorId	
+						});
+					}
+				});
+			}
+		});
+	}
 });
 
 // create school page
@@ -158,33 +205,81 @@ app.post('/createschool', function(req, res, next) {
 	var createSchoolQuery = "INSERT INTO Schools (schoolName, pictureURL, worldId) VALUES ( ? , ? , ? )";
 	var getSchoolQuery = "SELECT schoolId FROM Schools WHERE schoolName = ?";
 
-	mysql.pool.query(createSchoolQuery, data, function(err, rows, fields) {
-		if(err) {
-			console.log("error creating school");
-			console.log(err);
-			res.status(500).end();
+	if(req.body.world == "new") {
+		var createWorldQuery = "INSERT INTO Worlds (worldName) VALUES ( ? )";
+		var getWorldQuery = "SELECT worldId FROM Worlds WHERE worldName= ?";
+
+		mysql.pool.query(createWorldQuery, req.body.new_world, function(err, rows, fields) {
+			if(err) {
+				console.log("error creating world");
+				console.log(err);
+			}
+			else {
+				mysql.pool.query(getWorldQuery, req.body.new_world, function(err, rows, fields) {
+					if(err) {
+						console.log("error getting world");
+						console.log(err);
+					}
+					else {
+						data[2] = rows[0].worldId;
+
+						mysql.pool.query(createSchoolQuery, data, function(err, rows, fields) {
+							if(err) {
+								console.log("error creating school");
+								console.log(err);
+								res.status(500).end();
+							}
+							else {
+								mysql.pool.query(getSchoolQuery, req.body.name, function(err, rows, fields) {
+									if(err) {
+										console.log("error looking up school after creating");
+										console.log(err);
+									}
+									else {
+										res.status(200).json({
+											id: rows[0].schoolId
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+	}
+	else {
+		if(req.body.world == "null") {
+			var createSchoolQuery = "INSERT INTO Schools (schoolName, pictureURL) VALUES ( ? , ? )";
 		}
-		else {
-			mysql.pool.query(getSchoolQuery, req.body.name, function(err, rows, fields) {
-				if(err) {
-					console.log("error looking up school after creating");
-					console.log(err);
-				}
-				else {
-					res.status(200).json({
-						id: rows[0].schoolId
-					});
-				}
-			});
-		}
-	});
+		mysql.pool.query(createSchoolQuery, data, function(err, rows, fields) {
+			if(err) {
+				console.log("error creating school");
+				console.log(err);
+				res.status(500).end();
+			}
+			else {
+				mysql.pool.query(getSchoolQuery, req.body.name, function(err, rows, fields) {
+					if(err) {
+						console.log("error looking up school after creating");
+						console.log(err);
+					}
+					else {
+						res.status(200).json({
+							id: rows[0].schoolId
+						});
+					}
+				});
+			}
+		});
+	}
 });
 
 
 // login request
 app.get('/loginrequest', function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
-	var searchQueryString = "SELECT Users.userId FROM Users WHERE Users.fName = ? AND Users.lNAme = ?";
+	var searchQueryString = "SELECT Users.userId FROM Users WHERE Users.fName = ? AND Users.lName = ?";
 
 	responseJSON = {
 		success: false,
@@ -235,7 +330,7 @@ app.post('/createaccount', function(req, res, next) {
 	data1 = [req.body.fname, req.body.lname, req.body.bio, req.body.pic];
 	data2 = [req.body.fname, req.body.lname];
 
-	var createAccQuery = "INSERT INTO Users (fName, lName, biography, pictureURL, worldId) VALUES ( ? , ? , ? , ?, 6)";
+	var createAccQuery = "INSERT INTO Users (fName, lName, biography, pictureURL, worldId) VALUES ( ? , ? , ? , ?, 1)";
 	var getUserQuery = "SELECT userID FROM Users WHERE fName = ? AND lName = ?";
 
 	responseJSON = {
@@ -304,7 +399,7 @@ app.post('/createaccount', function(req, res, next) {
 
 // browse professors
 app.get('/browseprofessors', function(req, res, next) {
-	var getProfessorsQuery = "SELECT Professors.professorId, Professors.schoolId, Professors.worldId, Professors.fName, Professors.lName, Professors.pictureURL, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Worlds ON Worlds.worldId = Professors.WorldId INNER JOIN Schools ON Schools.schoolId = Professors.schoolId WHERE 1";
+	var getProfessorsQuery = "SELECT Professors.professorId, Professors.schoolId, Professors.worldId, Professors.fName, Professors.lName, Professors.pictureURL, Schools.schoolName, Worlds.worldName FROM Professors LEFT JOIN Worlds ON Worlds.worldId = Professors.WorldId INNER JOIN Schools ON Schools.schoolId = Professors.schoolId WHERE 1";
 
 	mysql.pool.query(getProfessorsQuery, function(err, rows, fields) {
 		if(err) {
@@ -316,6 +411,9 @@ app.get('/browseprofessors', function(req, res, next) {
 			for(var i = 0; i < rows.length; i++)
 			{
 				rows[i].link = 'href=professorreviews?id=' + rows[i].professorId;
+				if(rows[i].worldName != null) {
+					rows[i].worldName = "World: " + rows[i].worldName;
+				}
 			}
 			res.status(200).render('browseprofessors', {
 				results: rows
@@ -326,7 +424,7 @@ app.get('/browseprofessors', function(req, res, next) {
 
 // browse schools
 app.get('/browseschools', function(req, res, next) {
-	var getSchoolsQuery = "SELECT * FROM Schools INNER JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE 1";
+	var getSchoolsQuery = "SELECT * FROM Schools LEFT JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE 1";
 
 	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
 		if(err) {
@@ -338,6 +436,9 @@ app.get('/browseschools', function(req, res, next) {
 			for(var i = 0; i < rows.length; i++)
 			{
 				rows[i].link = 'href=schoolreviews?id=' + rows[i].schoolId;
+				if(rows[i].worldName != null) {
+					rows[i].worldName = "World: " + rows[i].worldName;
+				}
 			}
 			res.status(200).render('browseschools', {
 				results: rows
@@ -348,8 +449,30 @@ app.get('/browseschools', function(req, res, next) {
 
 // create review
 app.get('/createreview',function(req, res, next) {
-	res.status(200);
-	res.render('createreview');
+	var getSchoolsQuery = "SELECT schoolId, schoolName FROM Schools WHERE 1";
+	var getProfsQuery = "SELECT professorId, fName, lName FROM Professors WHERE 1";
+
+	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
+		if(err) {
+			console.log("error getting schools for create review");
+			console.log(err);
+		}
+		else {
+			schools = rows;
+			mysql.pool.query(getProfsQuery, function(err, rows, fields) {
+				if(err) {
+					console.log("error getting profs for create review");
+					console.log(err);
+				}
+				else {
+					res.status(200).render('createreview', {
+						schools: schools,
+						professors: rows
+					});
+				}
+			});
+		}
+	});
 });
 
 // update an existing review
@@ -401,15 +524,12 @@ app.post('/createreview', function(req, res, next) {
 
 	var userId = sessions[req.body.session_key].id;
 
-	var data1 = [parseInt(req.body.review_rating), req.body.justification, userId, parseInt(req.body.target_id)];
-	var data2 = [userId, parseInt(req.body.target_id)];
+	var data = [parseInt(req.body.review_rating), req.body.justification, userId, parseInt(req.body.target_id)];
 	if(req.body.review_type == "prof") {
 		createReviewQueryString = "INSERT INTO Reviews (rating, justification, userId, schoolId, professorId) VALUES ( ? , ? , ? , NULL, ? )";
-		createIntersectionQueryString = "INSERT INTO UserProfessorIntersections (reviewId, userId, professorId) VALUES ((SELECT reviewId FROM Reviews WHERE reviewId = @@Identity), ? , ? )";
 	}
 	else {
 		createReviewQueryString = "INSERT INTO Reviews (rating, justification, userId, schoolId, professorId) VALUES ( ? , ? , ? , ? , NULL);";
-		createIntersectionQueryString = "INSERT INTO UserSchoolIntersections (reviewId, userId, schoolId) VALUES ((SELECT reviewId FROM Reviews WHERE reviewId = @@Identity), ? , ? );";
 	}
 
 	mysql.pool.getConnection(function(err, connection) {
@@ -421,7 +541,7 @@ app.post('/createreview', function(req, res, next) {
 				});
 			}
 			else {
-				connection.query(createReviewQueryString, data1, function(err, results) {
+				connection.query(createReviewQueryString, data, function(err, results) {
 					if(err) { //transaction error
 						connection.rollback(function() {
 							connection.release();
@@ -429,25 +549,15 @@ app.post('/createreview', function(req, res, next) {
 						});
 					}
 					else {
-						connection.query(createIntersectionQueryString, data2, function(err, results) {
+						connection.commit(function(err) {
 							if(err) { //transaction error
 								connection.rollback(function() {
 									connection.release();
-									console.log("error q2 of transaction:\n" + err + "\n" + data2);
+									console.log("error commit transaction:\n" + err);
 								});
 							}
 							else {
-								connection.commit(function(err) {
-									if(err) { //transaction error
-										connection.rollback(function() {
-											connection.release();
-											console.log("error commit transaction:\n" + err);
-										});
-									}
-									else {
-										connection.release();
-									}
-								});
+								connection.release();
 							}
 						});
 					}
@@ -538,7 +648,7 @@ app.get('/schoolreviews',function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
 
 	var reviewQueryString = "SELECT * FROM Reviews INNER JOIN Schools ON Schools.schoolId = Reviews.schoolId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.schoolId = ?";
-	var schoolQueryString = "SELECT * FROM Schools INNER JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE Schools.schoolId = ?";
+	var schoolQueryString = "SELECT * FROM Schools LEFT JOIN Worlds ON Worlds.worldId = Schools.worldId WHERE Schools.schoolId = ?";
 
 	var sdata = {};
 
@@ -562,6 +672,9 @@ app.get('/schoolreviews',function(req, res, next) {
 		}
 		else
 		{
+			if(rows[0].worldName != null) {
+				rows[0].worldName = "World: " + rows[0].worldName;
+			}
 			sdata = rows[0];
 
 			mysql.pool.query(reviewQueryString, url_params.id, function(err, rows, fields) {
@@ -598,7 +711,7 @@ app.get('/professorreviews',function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
 
 	var reviewQueryString = "SELECT * FROM Reviews INNER JOIN Professors ON Professors.professorId = Reviews.professorId INNER JOIN Users ON Users.userID = Reviews.userId WHERE Reviews.professorId = ?";
-	var profQueryString = "SELECT Professors.pictureURL, Professors.fName, Professors.lName, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Schools ON Schools.schoolId = Professors.schoolId INNER JOIN Worlds ON Worlds.worldId = Professors.worldId WHERE Professors.professorId = ?";
+	var profQueryString = "SELECT Professors.pictureURL, Professors.fName, Professors.lName, Schools.schoolName, Worlds.worldName FROM Professors INNER JOIN Schools ON Schools.schoolId = Professors.schoolId LEFT JOIN Worlds ON Worlds.worldId = Professors.worldId WHERE Professors.professorId = ?";
 
 	var pdata = {};
 
@@ -622,6 +735,9 @@ app.get('/professorreviews',function(req, res, next) {
 		}
 		else
 		{
+			if(rows[0].worldName != null) {
+				rows[0].worldName = "World: " + rows[0].worldName;
+			}
 			pdata = rows[0];
 
 			mysql.pool.query(reviewQueryString, url_params.id, function(err, rows, fields) {
@@ -656,73 +772,42 @@ app.get('/professorreviews',function(req, res, next) {
 // delete review
 app.get('/deletereview', function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
-	var reviewTypeQueryString = "SELECT Reviews.professorId FROM Reviews WHERE Reviews.reviewId = ?";
-	var deleteQueryString1;
-	var deleteQueryString2 = "DELETE FROM Reviews WHERE Reviews.reviewId = ?";
+	var deleteQueryString = "DELETE FROM Reviews WHERE Reviews.reviewId = ?";
 
 	if(check_session_key(url_params.session_key)) {
-		mysql.pool.query(reviewTypeQueryString, url_params.id, function(err, rows, fields) {
-			if(err) {
-				console.log("sql error detecting review type for deletion");
-				console.log(err);
-			}
-			else
-			{
-				if(rows[0].professorId != null) {
-					// prof review
-					deleteQueryString1 = "DELETE FROM UserProfessorIntersections WHERE reviewId = ?"
+		mysql.pool.getConnection(function(err, connection) {
+			connection.beginTransaction(function(err) {
+				if(err) { //transaction error
+					connection.rollback(function() {
+						connection.release();
+						console.log("error init transaction:\n" + err);
+					});
 				}
 				else {
-					// school review
-					deleteQueryString1 = "DELETE FROM UserSchoolIntersections WHERE reviewId = ?"
-				}
-
-
-				mysql.pool.getConnection(function(err, connection) {
-					connection.beginTransaction(function(err) {
+					connection.query(deleteQueryString, url_params.id, function(err, results) {
 						if(err) { //transaction error
 							connection.rollback(function() {
 								connection.release();
-								console.log("error init transaction:\n" + err);
+								console.log("error q2 of transaction:\n" + err);
 							});
 						}
 						else {
-							connection.query(deleteQueryString1, url_params.id, function(err, results) {
+							connection.commit(function(err) {
 								if(err) { //transaction error
 									connection.rollback(function() {
 										connection.release();
-										console.log("error q1 of transaction:\n" + err);
+										console.log("error commit transaction:\n" + err);
 									});
 								}
 								else {
-									connection.query(deleteQueryString2, url_params.id, function(err, results) {
-										if(err) { //transaction error
-											connection.rollback(function() {
-												connection.release();
-												console.log("error q2 of transaction:\n" + err);
-											});
-										}
-										else {
-											connection.commit(function(err) {
-												if(err) { //transaction error
-													connection.rollback(function() {
-														connection.release();
-														console.log("error commit transaction:\n" + err);
-													});
-												}
-												else {
-													connection.release();
-													res.status(200).end();
-												}
-											});
-										}
-									});
+									connection.release();
+									res.status(200).end();
 								}
 							});
 						}
 					});
-				});
-			}
+				}
+			});
 		});
 	}
 	else {
