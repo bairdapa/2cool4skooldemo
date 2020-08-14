@@ -449,8 +449,30 @@ app.get('/browseschools', function(req, res, next) {
 
 // create review
 app.get('/createreview',function(req, res, next) {
-	res.status(200);
-	res.render('createreview');
+	var getSchoolsQuery = "SELECT schoolId, schoolName FROM Schools WHERE 1";
+	var getProfsQuery = "SELECT professorId, fName, lName FROM Professors WHERE 1";
+
+	mysql.pool.query(getSchoolsQuery, function(err, rows, fields) {
+		if(err) {
+			console.log("error getting schools for create review");
+			console.log(err);
+		}
+		else {
+			schools = rows;
+			mysql.pool.query(getProfsQuery, function(err, rows, fields) {
+				if(err) {
+					console.log("error getting profs for create review");
+					console.log(err);
+				}
+				else {
+					res.status(200).render('createreview', {
+						schools: schools,
+						professors: rows
+					});
+				}
+			});
+		}
+	});
 });
 
 // update an existing review

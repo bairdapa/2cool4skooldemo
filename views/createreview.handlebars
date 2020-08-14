@@ -12,15 +12,15 @@
 		<input type="radio" id="radio_prof" name="review_type" value="prof">
 		<label for="radio_prof" class="normal_text">Professor</label><br>
 		<br>
-		<label for="name" class="normal_text">School or Professor Name: </label>
-		<select name="name" id="create_review_school_name" class="create_review_name">
-			{{#each schools}}
-				<option value="{{schoolId}}">"{{schoolName}}"</option>
-			{{/each}}
-		</select>
+		<label for="name" class="normal_text">School or Professor Name: </label><br>
 		<select name="name" id="create_review_prof_name" class="create_review_name">
 			{{#each professors}}
-				<option value="{{professorId}}">"{{fName}} {{lName}}"</option>
+				<option value="{{professorId}}">{{fName}} {{lName}}</option>
+			{{/each}}
+		</select>
+		<select name="name" id="create_review_school_name" class="create_review_name">
+			{{#each schools}}
+				<option value="{{schoolId}}">{{schoolName}}</option>
 			{{/each}}
 		</select>
 		<br>
