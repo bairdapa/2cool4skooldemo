@@ -44,6 +44,16 @@ $(document).ready(function() {
 		$("#home_create_review").attr("href", "createreview");
 	}
 
+	$("#radio_school").click(function(){
+		$(this).parent().find("#create_review_school_name").css("display", "block");
+		$(this).parent().find("#create_review_prof_name").css("display", "none");
+	});
+
+	$("#radio_prof").click(function(){
+		$(this).parent().find("#create_review_school_name").css("display", "none");
+		$(this).parent().find("#create_review_prof_name").css("display", "block");
+	});
+
 	$("#prof_search_textbox").keypress(function(e) {
 		if(e.keyCode == 13) {
 			$("#prof_search_button").click();
@@ -132,7 +142,6 @@ $(document).ready(function() {
 
 	$("#submit_review").click(function() {
 		var review_type;
-		var review_target_id = -1;
 		var $selected = $('input[name="review_type"]:checked');
 		if($selected.legnth == 0) {
 			alert("please select either professor or school for your review type");
@@ -144,44 +153,11 @@ $(document).ready(function() {
 
 		if(review_type == "prof")
 		{
-			var full_name = $("#create_review_textbox").val();
-			var name_arr = full_name.split(" ");
-
-			$.get("searchprofessors?fname=" + name_arr[0] + "&lname=" + name_arr[1], function(data, status) {
-				if(status == "success") {
-					if(data.found) {
-						review_target_id = data.id;
-						create_review(review_type, review_target_id, create_review_rating, $("#create_review_justification").val());
-					}
-					else
-					{
-						alert("the professor you tried to create a review for is not in the database");
-					}
-				}
-				else {
-					alert("create review request caused an error on the server!");
-				}
-			});
+			create_review(review_type, $("#create_review_prof_name").val(), create_review_rating, $("#create_review_justification").val());
 		}
 		else
 		{
-			var name = $("#create_review_textbox").val();
-
-			$.get("searchschools?schoolname=" + name, function(data, status) {
-				if(status == "success") {
-					if(data.found) {
-						review_target_id = data.id;
-						create_review(review_type, review_target_id, create_review_rating, $("#create_review_justification").val());
-					}
-					else
-					{
-						alert("the school you tried to create a review for is not in the database");
-					}
-				}
-				else {
-					alert("create review request caused an error on the server!");
-				}
-			});
+			create_review(review_type, $("#create_review_school_name").val(), create_review_rating, $("#create_review_justification").val());
 		}
 	});
 

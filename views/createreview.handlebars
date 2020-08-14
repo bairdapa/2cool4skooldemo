@@ -13,7 +13,7 @@
 		<label for="radio_prof" class="normal_text">Professor</label><br>
 		<br>
 		<label for="name" class="normal_text">School or Professor Name: </label><br>
-		<select name="name" id="create_review_prof_name" class="create_review_name">
+		<select name="name" id="create_review_prof_name" class="create_review_name" style="display:none">
 			{{#each professors}}
 				<option value="{{professorId}}">{{fName}} {{lName}}</option>
 			{{/each}}
