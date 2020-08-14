@@ -106,9 +106,9 @@ app.get('/createprofessor', function(req, res, next) {
 // create professor action
 app.post('/createprofessor', function(req, res, next) {
 	var data1 = [req.body.fname, req.body.lname, req.body.pic, req.body.school, req.body.world];
-	var data2 = [req.body.fname, req.body.lname]
+	var data2 = [req.body.fname, req.body.lname];
 
-		var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId, worldId) VALUES ( ? , ? , ? , ? , ? )";
+	var createProfQuery = "INSERT INTO Professors (fName, lName, pictureURL, schoolId, worldId) VALUES ( ? , ? , ? , ? , ? )";
 	var getProfQuery = "SELECT professorId FROM Professors WHERE fName = ? AND lName = ?";
 
 	if(req.body.world == "new") {
@@ -279,7 +279,7 @@ app.post('/createschool', function(req, res, next) {
 // login request
 app.get('/loginrequest', function(req, res, next) {
 	var url_params = url.parse(req.url, true).query;
-	var searchQueryString = "SELECT Users.userId FROM Users WHERE Users.fName = ? AND Users.lNAme = ?";
+	var searchQueryString = "SELECT Users.userId FROM Users WHERE Users.fName = ? AND Users.lName = ?";
 
 	responseJSON = {
 		success: false,
@@ -330,7 +330,7 @@ app.post('/createaccount', function(req, res, next) {
 	data1 = [req.body.fname, req.body.lname, req.body.bio, req.body.pic];
 	data2 = [req.body.fname, req.body.lname];
 
-	var createAccQuery = "INSERT INTO Users (fName, lName, biography, pictureURL, worldId) VALUES ( ? , ? , ? , ?, 6)";
+	var createAccQuery = "INSERT INTO Users (fName, lName, biography, pictureURL, worldId) VALUES ( ? , ? , ? , ?, 1)";
 	var getUserQuery = "SELECT userID FROM Users WHERE fName = ? AND lName = ?";
 
 	responseJSON = {
