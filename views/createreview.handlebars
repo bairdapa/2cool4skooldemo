@@ -1,0 +1,38 @@
+<div class="container">
+
+    <div class="create_review_title">
+	    <h1 class="create_review_title">Create Review</h1>
+    </div>
+
+    <div class="create_review_form">
+		<a class="normal_text">Create a review for a:</a><br>
+		<br>
+		<input type="radio" id="radio_school" name="review_type" value="school" checked>
+		<label for="radio_school" class="normal_text">School</label><br>
+		<input type="radio" id="radio_prof" name="review_type" value="prof">
+		<label for="radio_prof" class="normal_text">Professor</label><br>
+		<br>
+		<label for="name" class="normal_text">School or Professor Name: </label><br>
+		<select name="name" id="create_review_prof_name" class="create_review_name" style="display:none">
+			{{#each professors}}
+				<option value="{{professorId}}">{{fName}} {{lName}}</option>
+			{{/each}}
+		</select>
+		<select name="name" id="create_review_school_name" class="create_review_name">
+			{{#each schools}}
+				<option value="{{schoolId}}">{{schoolName}}</option>
+			{{/each}}
+		</select>
+		<br>
+		<button id="create_review_1star" class="create_review_star_button">☆</button> 
+		<button id="create_review_2star" class="create_review_star_button">☆</button> 
+		<button id="create_review_3star" class="create_review_star_button">☆</button> 
+		<button id="create_review_4star" class="create_review_star_button">☆</button> 
+		<button id="create_review_5star" class="create_review_star_button">☆</button> 
+		<br>
+		<textarea class="create_review_justification" id="create_review_justification" placeholder="justify your review here"></textarea>
+		<br>
+		<br>
+		<button id="submit_review" class="submit_review">Submit Review</button>
+    </div>
+</div>
