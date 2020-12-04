@@ -1,3 +1,7 @@
 # 2cool4skool
 
-The new repository for Xander and Odyssey's CS340 Databases project.
+This repository is a home for anyone to browse the code that was used to host 2cool4skool.
+
+Created by Alexander Baird-Appleton and Odyssey Wilson.
+
+Unliscened.
